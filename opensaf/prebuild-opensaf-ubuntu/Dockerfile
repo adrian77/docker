@@ -1,0 +1,66 @@
+FROM ubuntu:14.04
+MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
+# @Version: 1.2
+# The following docker file perform E2E development setup to OpenSAF installation 
+#   Moments contain download development packages; download OpenSAF source code; compile; install and finally remove the development packages and the build result
+#
+# How to run container from this image:
+# NODE=SC-1 && docker run -t --name $NODE -h $NODE -v /home/adrian/sharedfs:/etc/opensaf/sharedfs -i <img-id> 
+# /etc/init.d/opensafd start
+#
+# It is though better to run it as daemon
+# NODE=SC-1 && docker run --privileged -d --name $NODE -h $NODE -i <img-id>
+#
+# Then enter container using nsenter (just google it and install it)
+# PID=`docker inspect --format {{.State.Pid}} SC-1`
+# sudo nsenter --target $PID --mount --uts --ipc --net --pid
+#
+# Shared fs if you have two controllers. The setup-opensaf-node will check for this dir and use that instead.
+# Additional use -v /home/adrian/sharedfs:/etc/opensaf/sharedfs and then configure IMM PBE to use this directory persisting IMM data
+#
+
+RUN mkdir -p /home/opensaf
+WORKDIR /home/opensaf
+
+# Add helper build scripts 
+ADD home/opensaf /home/opensaf
+ADD sbin/tipc-config /sbin/tipc-config
+
+# make sure the package repository is up to date
+RUN apt-get update
+
+# Packages for useability
+RUN apt-get install -y vim && \
+    apt-get clean
+
+# Packages needed for for runtime. Python is only used for generation of initial xml; but also for cluster resize.
+RUN apt-get install -y sudo sqlite3 libxml2 psmisc python && \
+    apt-get clean  
+
+# Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
+RUN apt-get install -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtool pkg-config make python-dev libsqlite3-dev && \
+    apt-get clean && \
+    echo "# Download and build OpenSAF" && \
+    cd /home/opensaf && \
+    ./download-opensaf && \
+    ./configure-opensaf default && \
+    ./install-opensaf && \ 
+    rm -rf /home/opensaf/opensaf-* && \
+    echo "# Remove development packages" && \
+    apt-get remove -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtool pkg-config make python-dev libsqlite3-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /home/opensaf/download-opensaf && \
+    rm -rf /home/opensaf/configure-opensaf && \
+    rm -rf /home/opensaf/install-opensaf && \
+    sed '/\. \/lib\/lsb\/init-functions/ a\\/home\/opensaf\/setup-opensaf-node' -i /etc/init.d/opensafd
+
+RUN groupadd opensaf && \
+ useradd -r -g opensaf -d /var/run/opensaf -s /sbin/nologin -c "OpenSAF" opensaf && \
+ echo '%{opensaf_user} ALL = NOPASSWD: /sbin/reboot, /sbin/tipc-config, /usr/bin/pkill, /usr/bin/killall' >> /etc/sudoers && \
+ echo 'Defaults:%opensaf !requiretty' >> /etc/sudoers && \
+ echo 'Defaults:opensaf !requiretty' >> /etc/sudoers
+
+ENV container docker
+
+CMD    ["/bin/bash"]

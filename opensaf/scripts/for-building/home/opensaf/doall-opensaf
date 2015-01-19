@@ -1,0 +1,5 @@
+./download-opensaf
+./configure-opensaf-basic
+./install-opensaf
+./setup-opensaf-node
+./start-opensaf

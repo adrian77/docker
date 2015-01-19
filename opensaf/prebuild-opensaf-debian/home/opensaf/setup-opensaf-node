@@ -1,0 +1,64 @@
+#!/bin/bash
+# Node configuration script
+iface=eth0
+payloads=8
+
+ip=`ifconfig $iface | grep inet | grep -v inet6 | grep -Po '(?<=(inet )|(inet addr:))[0-9].*' | cut -d " " -f1`
+sed s/DTM_NODE_IP=.*/DTM_NODE_IP=$ip/ -i /etc/opensaf/dtmd.conf
+
+# Configure the multicast address
+sed s/DTM_MCAST_ADDR=.*/DTM_MCAST_ADDR=224.0.0.6/ -i /etc/opensaf/dtmd.conf
+
+# For some reason -disable-ais-plm does not work on fedora
+sed -e 's/^\/usr\/local\/lib\/opensaf\/clc-cli\/osaf-plmd\:PLMD/#\/usr\/local\/lib\/opensaf\/clc-cli\/osaf-plmd\:PLMD/' -i /etc/opensaf/nodeinit.conf.controller
+
+# Enable sqlite3 db configuration
+sed -e 's/#export IMMSV_PBE_FILE=imm.db/export IMMSV_PBE_FILE=imm.db/' -i /etc/opensaf/immnd.conf
+
+# default imm configuration location
+immdir=/etc/opensaf
+
+# If the user have exposed sharefs dir; use that instead
+if [ -d /etc/opensaf/sharedfs ]; then
+  immdir=/etc/opensaf/sharedfs
+  sed s/^export.IMMSV_ROOT_DIRECTORY=.*/"export IMMSV_ROOT_DIRECTORY=\/etc\/opensaf\/sharedfs"/ -i /etc/opensaf/immnd.conf
+fi
+
+# Host specific configuration
+hostname | cut -d "-" -f 2 > /etc/opensaf/slot_id
+type=`hostname | cut -d "-" -f 1`
+if [ $type = "PL" ]; then
+  echo "payload" > /etc/opensaf/node_type
+else
+  echo "controller" > /etc/opensaf/node_type
+fi
+hostname > /etc/opensaf/node_name
+
+# Configuration of the firewall only applicable when using with fedora and systemd
+iptables --version > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+  iptables -I INPUT 1 -d 224.0.0.6 -p udp --dport 6900 -m pkttype --pkt-type multicast -j ACCEPT
+  iptables -I INPUT 1 -p tcp --dport 6700 -m conntrack --ctstate NEW -j ACCEPT
+fi
+
+if [ $(cat /etc/opensaf/node_type) = "controller" ]; then
+  if [ ! -f $immdir/imm.xml ]; then
+    cd /usr/local/share/opensaf/immxml
+    rm -f imm.xml.*
+    ./immxml-clustersize -s 2 -p $payloads
+    ./immxml-configure
+    cp imm.xml.* $immdir/imm.xml
+    # Enable Persistent Backend
+    sed '/safRdn=immManagement,safApp=safImmService/,/<\/attr>/ { s/2/1/g; }' -i $immdir/imm.xml
+    rm -f imm.xml.*
+  fi
+fi
+
+# Sometimes these were not properly cleaned 
+rm -rf /var/run/opensaf/*
+
+# Make sure permissions are set for non root
+chown opensaf:opensaf /var/lib/opensaf
+chown opensaf:opensaf /var/run/opensaf
+chown -R opensaf:opensaf /var/log/opensaf
+chown -R opensaf:opensaf /etc/opensaf

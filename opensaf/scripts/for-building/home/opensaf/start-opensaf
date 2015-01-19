@@ -1,0 +1,8 @@
+#!/bin/bash
+# Start script to prepare configuration
+
+# Start opensaf via systemd
+#systemctl start opensafd.service
+# Some issues have detected with terminating container where things were remaining in /var/lib/opensaf
+/etc/init.d/opensafd stop
+/etc/init.d/opensafd start
