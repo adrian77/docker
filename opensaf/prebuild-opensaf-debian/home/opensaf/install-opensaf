@@ -1,3 +1,0 @@
-cd opensaf-*
-make install
-ldconfig
