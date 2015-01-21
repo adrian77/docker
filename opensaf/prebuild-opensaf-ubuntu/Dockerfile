@@ -23,8 +23,15 @@ RUN mkdir -p /home/opensaf
 WORKDIR /home/opensaf
 
 # Add helper build scripts 
-ADD home/opensaf /home/opensaf
-ADD sbin/tipc-config /sbin/tipc-config
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/download-opensaf /home/opensaf/download-opensaf
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/configure-opensaf-basic /home/opensaf/configure-opensaf-basic
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/download-opensaf /home/opensaf/install-opensaf
+
+# Add binaries and scripts needing for runtime
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc-config /sbin/tipc-config
+
+RUN chmod u+x /home/opensaf/*
 
 # make sure the package repository is up to date
 RUN apt-get update
@@ -43,7 +50,7 @@ RUN apt-get install -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtoo
     echo "# Download and build OpenSAF" && \
     cd /home/opensaf && \
     ./download-opensaf && \
-    ./configure-opensaf default && \
+    ./configure-opensaf-basic default && \
     ./install-opensaf && \ 
     rm -rf /home/opensaf/opensaf-* && \
     echo "# Remove development packages" && \
@@ -51,7 +58,7 @@ RUN apt-get install -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtoo
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /home/opensaf/download-opensaf && \
-    rm -rf /home/opensaf/configure-opensaf && \
+    rm -rf /home/opensaf/configure-opensaf-basic && \
     rm -rf /home/opensaf/install-opensaf && \
     sed '/\. \/lib\/lsb\/init-functions/ a\\/home\/opensaf\/setup-opensaf-node' -i /etc/init.d/opensafd
 

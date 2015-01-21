@@ -1,0 +1,33 @@
+# Common routines to be sourced.
+
+# Arg $@ Argument to be printed as error
+function die_error()
+{
+   echo ERROR $@
+   exit 1
+}
+
+function assert_args()
+{
+   test -z $1 && die_error "Missing argument."
+}
+
+
+function bin_exist()
+{
+   which $1 > /dev/null 2>&1
+   return $?
+}
+
+# Function that securely deleted file
+function secure_delete()
+{
+   if [ -e $1 ]; then  
+      bin_exist shred
+      if [ $? -eq 0 -a -f $1 ]; then
+         shred -z -n 4 -u $1
+      else
+         rm -rf $1
+      fi
+   fi
+}

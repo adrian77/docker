@@ -6,7 +6,7 @@ MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 #
 # How to run container from this image:
 # NODE=SC-1 && docker run -t --name $NODE -h $NODE -i <img-id> 
-# /home/opensaf/setup-opensaf-node && /etc/init.d/opensafd start
+# /etc/init.d/opensafd start
 #
 # It is though better to run it as daemon
 # NODE=SC-1 && docker run --privileged -d --name $NODE -h $NODE -i <img-id>
@@ -22,8 +22,11 @@ MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 RUN mkdir -p /home/opensaf
 WORKDIR /home/opensaf
 
-# Add helper build scripts 
-ADD home/opensaf /home/opensaf
+# Add binaries and scripts needing for runtime
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc-config /sbin/tipc-config
+
+RUN chmod u+x /home/opensaf/*
 
 # make sure the package repository is up to date
 RUN apt-get update
@@ -53,9 +56,6 @@ RUN apt-get install -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtoo
     apt-get remove -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtool pkg-config make python-dev libsqlite3-dev && \
     apt-get autoremove -y && \
     apt-get clean && \
-    rm -rf /home/opensaf/download-opensaf && \
-    rm -rf /home/opensaf/configure-opensaf && \
-    rm -rf /home/opensaf/install-opensaf && \
     sed '/\. \/lib\/lsb\/init-functions/ a\\/home\/opensaf\/setup-opensaf-node' -i /etc/init.d/opensafd
 
 RUN groupadd opensaf && \
