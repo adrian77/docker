@@ -5,7 +5,7 @@ MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 #   Momements contain download development packages; download OpenSAF source code; compile; install and finally remove the development packages and the build result
 #
 # How to run container from this image:
-# NODE=SC-1 && docker run -t --name $NODE -h $NODE -i <img-id> 
+# NODE=SC-1 && docker run --privileged -t --name $NODE -h $NODE -i <img-id> 
 # /etc/init.d/opensafd start
 #
 # It is though better to run it as daemon

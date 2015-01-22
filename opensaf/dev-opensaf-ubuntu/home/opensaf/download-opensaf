@@ -1,0 +1,5 @@
+#file=opensaf-4.4.0.tar.gz
+#wget http://sourceforge.net/projects/opensaf/files/releases/$file
+#tar -xzvf $file
+
+hg clone http://hg.code.sf.net/p/opensaf/staging opensaf-staging

@@ -5,7 +5,7 @@ MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 #   Moments contain download development packages; download OpenSAF source code; compile; install and finally remove the development packages and the build result
 #
 # How to run container from this image:
-# NODE=SC-1 && docker run -t --name $NODE -h $NODE -v /home/adrian/sharedfs:/etc/opensaf/sharedfs -i <img-id> 
+# NODE=SC-1 && docker run --privileged -t --name $NODE -h $NODE -v /home/adrian/sharedfs:/etc/opensaf/sharedfs -i <img-id> 
 # /etc/init.d/opensafd start
 #
 # It is though better to run it as daemon
@@ -25,7 +25,7 @@ WORKDIR /home/opensaf
 # Add helper build scripts 
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/download-opensaf /home/opensaf/download-opensaf
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/configure-opensaf-basic /home/opensaf/configure-opensaf-basic
-ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/download-opensaf /home/opensaf/install-opensaf
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/install-opensaf /home/opensaf/install-opensaf
 
 # Add binaries and scripts needing for runtime
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
