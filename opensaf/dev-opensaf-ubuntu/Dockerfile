@@ -44,10 +44,6 @@ RUN groupadd opensaf && \
 
 ENV container docker
 
-# Add helper scripts normally executed in the following order
-ADD home/opensaf /home/opensaf
-ADD sbin/tipc-config /sbin/tipc-config
-
 # Add helper build scripts
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/download-opensaf /home/opensaf/download-opensaf
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/configure-opensaf-basic /home/opensaf/configure-opensaf-basic
@@ -58,7 +54,6 @@ ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for
 # Add binaries and scripts needing for runtime
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc-config /sbin/tipc-config
-ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/start-opensaf /home/opensaf/start-opensaf
 
 RUN chmod u+x /home/opensaf/* && chmod u+x /sbin/tipc-config
 
