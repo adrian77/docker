@@ -1,0 +1,44 @@
+# On the host os. Install the kernel with TIPC support. It will configure grub to boot from this kernel.
+sudo dpkg -i linux*.deb
+sudo reboot
+
+modprobe tipc   (or  insmod /lib/modules/3.19.0-rc4+/kernel/net/tipc/tipc.ko )
+lsmod | grep tipc
+
+# To revert back to old kernel. Execute this command on the host os.
+sudo dpkg -r linux-image-3.19.0-rc4
+
+# Example of container configuration of tipc using the /INBOX/tipc-config. This is done inside the container. 
+tipc-config -netid=1234
+tipc-config -a=1.1.1
+tipc-config -be=eth:eth0
+
+
+# Instruction if you want to compile the kernel from scratch. 
+# Download kernel from https://www.kernel.org/ into folder /home/adrian/kernel-3.19
+# Uncompress 
+tar -xvz kernel.tar
+# On ubuntu 14 system
+sudo apt-get install gcc libncurses5-dev dpkg-dev
+# configure based on the currently loaded kernel modules
+make localmodconfig
+# Set the following configuration options in your .config
+CONFIG_TIPC=m
+CONFIG_NFT_MASQ=m
+CONFIG_NF_NAT_MASQUERADE_IPV4=m
+CONFIG_NF_NAT_MASQUERADE_IPV6=m
+CONFIG_NETFILTER_XT_NAT=m
+CONFIG_IP_NF_NAT=m
+CONFIG_IP6_NF_NAT=m
+
+make -j 5 KDEB_PKGVERSION=1.aslinux deb-pkg
+
+# Install the kernel 
+sudo dpkg -i ../linux*.deb
+sudo reboot
+modprobe tipc
+lsmod | grep tipc
+
+# When you want to revert back to your old kernel version
+sudo dpkg -r linux-image-3.19.0-rc3+
+

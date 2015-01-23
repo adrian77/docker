@@ -1,0 +1,2 @@
+docker run --privileged -w /home/opensaf -d -t --name $2 -h sshserver -i -v /home/adrian/:/home/adrian:rw -v /sys/fs/cgroup:/sys/fs/cgroup -p 23:22 --env=container=docker $1 $3
+#docker run --privileged -w /home/opensaf -t --name $2 -h sshserver -i -v /home/adrian/:/home/adrian:rw -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 23:22 --env=container=docker $1 $3
