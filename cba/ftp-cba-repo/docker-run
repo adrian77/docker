@@ -1,0 +1,2 @@
+sudo docker run -t --name cba-ftp -h cba-ftp-server -p 0.0.0.0:211:21 -v /media/cdrom:/yum-repos/rhel-server-6.6 -v /media/cdrom1:/yum-repos/rhel-server-6.5 -v /home/adrian/cba-repo:/yum-repos/cba-repo -i adrianszwej/private:ftp-cba-repos /bin/bash
+#sudo docker run --privileged -d -t --name cba-ftp -h cba-ftp-server -p 0.0.0.0:211:21 -v /media/cdrom:/yum-repos/cdrom -v /home/adrian/cba-repo:/yum-repos/cba-repo -i adrianszwej/private:ftp-cba-repos

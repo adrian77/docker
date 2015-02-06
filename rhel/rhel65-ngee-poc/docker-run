@@ -1,0 +1,1 @@
+NODE=SC-1 && sudo docker run --privileged -t --env TIPC=yes --name rhel65 -h $NODE -v /home/adrian/storage:/storage --link cba-ftp:cba-yum-server -i adrianszwej/private:rhel6.5-cba-base /bin/bash
