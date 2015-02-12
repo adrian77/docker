@@ -1,0 +1,6 @@
+rhel65-base              - Common stuff
+rhel65-cba-base          - Adaptation for CBA
+rhel65-cmw-prebase       - Container adaptation for CoreMW
+rhel65-cmw-base-SC       - Installed cmw
+rhel65-lmstack-prebase   - Container adaptation for lm based on prebase of cmw
+rhel65-lmstack-base      - Installed LmStack

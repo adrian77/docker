@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Add you rpms in repo/RPMS/
+
+createrepo --database repo/

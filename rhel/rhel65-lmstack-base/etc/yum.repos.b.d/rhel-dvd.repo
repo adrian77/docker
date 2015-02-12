@@ -1,0 +1,6 @@
+[rhel-dvd]
+name=Red Hat Enterprise Linux $releasever - $basearch - DVD
+baseurl=ftp://172.17.0.4:21/rhel-server-6.5/Server/
+enabled=1
+gpgcheck=1
+gpgkey=ftp://172.17.0.4:21/rhel-server-6.5/RPM-GPG-KEY-redhat-release

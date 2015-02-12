@@ -1,0 +1,5 @@
+[CBA-repo]
+name=CBA Software Repository
+baseurl=ftp://cba-yum-server/cba-repo
+enabled=1
+gpgcheck=0

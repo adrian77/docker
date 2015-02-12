@@ -1,0 +1,6 @@
+[CBA-repo]
+name=CBA Software Repository used during docker image building process
+baseurl=ftp://172.17.0.4:21/cba-repo/
+enabled=1
+gpgcheck=0
+

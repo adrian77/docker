@@ -4,4 +4,4 @@
 
 . ../../bin/for-docker/common-routines
 
-docker build -t="adrianszwej/private:rhel6.5-base" . 
+docker build -t="adrianszwej/private:rhel6.5-cmw-base" . 

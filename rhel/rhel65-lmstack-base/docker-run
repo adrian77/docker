@@ -1,0 +1,3 @@
+#!/bin/bash
+[[ ! -z $1 ]] && NAME="--name $1"
+NODE=SC-1 && sudo docker run --privileged -t --env TIPC=yes $NAME -h $NODE -v /home/adrian/storage:/storage --link cba-ftp:cba-yum-server -i adrianszwej/private:rhel6.5-lmstack-base /bin/bash

@@ -1,0 +1,6 @@
+[scl_python27]
+name=Python 2.7 Dynamic Software Collection
+baseurl=http://people.redhat.com/bkabrda/python27-rhel-6/
+failovermethod=priority
+enabled=1
+gpgcheck=0

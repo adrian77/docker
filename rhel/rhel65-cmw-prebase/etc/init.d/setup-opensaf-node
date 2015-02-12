@@ -1,0 +1,61 @@
+#!/bin/bash
+# Node configuration script for opensaf node
+# @version: 1.1
+#   added tipc configuration support
+# @version: 1.0
+#   initial version
+#
+# @Author: Adrian Szwej <adrian.szwej@gmail.com>
+
+iface=eth0
+payloads=8
+[[ -z $TIPC ]] && TIPC=no
+
+#tipc configuration
+tipc_netid=1234
+tipc_be=eth:$iface
+
+#tcp configuration
+mcast=224.0.0.6
+
+# For some reason -disable-ais-plm does not work on fedora
+sed -e 's/^\/usr\/local\/lib\/opensaf\/clc-cli\/osaf-plmd\:PLMD/#\/usr\/local\/lib\/opensaf\/clc-cli\/osaf-plmd\:PLMD/' -i /etc/opensaf/nodeinit.conf.controller
+
+# default imm configuration location
+immdir=/storage/clear/coremw/etc
+
+# Host specific configuration
+hostname | cut -d "-" -f 2 > /etc/opensaf/slot_id
+type=`hostname | cut -d "-" -f 1`
+if [ $type = "PL" ]; then
+  echo "payload" > /etc/opensaf/node_type
+else
+  echo "controller" > /etc/opensaf/node_type
+fi
+hostname > /etc/opensaf/node_name
+
+[[ "$TIPC" = "yes" ]] && ((lsmod | grep "^tipc " > /dev/null) || (echo "Error! The host OS does not have tipc module loaded. Try 'modprobe tipc' in the host os." && exit 1))
+
+if [ "$TIPC" = "yes" ]; then
+  sed 's/export MDS_TRANSPORT=TCP/export MDS_TRANSPORT=TIPC/' -i /etc/opensaf/nid.conf
+  sed s/TIPC_ETH_IF=eth0/TIPC_ETH_IF=$iface/ -i /etc/opensaf/nid.conf
+  sed s/TIPC_NET_ID=1234/TIPC_NET_ID=$tipc_netid/ -i /etc/opensaf/nid.conf
+  tipc-config -netid=$tipc_netid
+  tipc-config -a=1.1.`cat /etc/opensaf/slot_id`
+  tipc-config -be=$tipc_be
+else
+  sed 's/export MDS_TRANSPORT=TIPC/export MDS_TRANSPORT=TCP/' -i /etc/opensaf/nid.conf
+  ip=`ifconfig $iface | grep inet | grep -v inet6 | grep -Po '(?<=(inet )|(inet addr:))[0-9].*' | cut -d " " -f1`
+  sed s/DTM_NODE_IP=.*/DTM_NODE_IP=$ip/ -i /etc/opensaf/dtmd.conf
+
+  # Configure the multicast address
+  sed s/DTM_MCAST_ADDR=.*/DTM_MCAST_ADDR=$mcast/ -i /etc/opensaf/dtmd.conf
+fi
+
+#if [ ! -f $immdir/imm.db ]; then
+#   /opt/coremw/sbin/cleanup
+#   /opt/coremw/sbin/setup 2 $payloads
+#fi
+
+# Sometimes these were not properly cleaned 
+rm -rf /var/run/opensaf/*
