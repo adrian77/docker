@@ -1,0 +1,19 @@
+#!/bin/bash
+NODE=SC-1
+NAME=ns$NODE
+
+# create tipc namespace
+#NS=`../../bin/for-docker/tipc-namespace-create 1`
+if [ $? -eq 0 ]; then
+  docker run --privileged -t -d -h $NODE --name $NAME --env TIPC=yes -v /home/adrian/sharedfs:/etc/opensaf/sharedfs -i adrianszwej/opensaf:4.6-ubuntu-14 
+  [[ $? -ne 0 ]] && exit 1
+fi
+
+PID=`docker inspect -f '{{.State.Pid}}' $NAME`
+echo /var/run/netns/$PID
+
+# Make visible namespace for the ip command
+mkdir -p /var/run/netns
+ln -s /proc/$PID/ns/net /var/run/netns/$PID
+#../../bin/for-docker/tipc-namespace-setup $PID ${NODE/*-} 
+bash -x ../../bin/for-docker/tipc-namespace-setup $PID ${NODE/*-} 

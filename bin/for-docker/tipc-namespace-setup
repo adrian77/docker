@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Script that configures a namespace with tipc address
+CLUSTER=4711
+lan=mvl_$CLUSTER
+LANIF=eth0
+NETID=4711
+NS=$1
+NODE=$2
+
+# arg1 : namespace
+# arg2 : laninterface
+# arg3 : node id
+function __on_ns_exec()
+{
+    ip netns exec $1 tipc-config -a=1.1.$3 
+    ip netns exec $1 tipc-config -be=eth:$2 
+    ip netns exec $1 tipc-config -netid=$NETID
+}
+
+# Creates a namespace and assign the tipc address
+# arg1: node id
+function __setup_namespace()
+{
+    local ns=$1
+    local nodeid=$2
+
+    # Create macvlan interface connected to lan
+    ip link add link $LANIF name $lan type macvlan mode bridge
+    # Associate the namespace to the newly created macvlan interface
+    ip link set $lan netns $ns 
+    # Bring up all created interface via their namespace
+    ip netns exec $ns ip link set $lan up
+    # Configure address for each namespace
+    __on_ns_exec $ns $lan $nodeid 
+}
+
+__setup_namespace $NS $NODE

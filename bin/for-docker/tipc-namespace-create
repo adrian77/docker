@@ -1,0 +1,42 @@
+#!/bin/bash
+CLUSTER=4711
+lan=mvl_$CLUSTER
+LANIF=eth0
+NODE=$1
+NETID=4711
+
+# Function that build namespace name according to pattern N<network_id>_node-<nodeid>
+function __ns()
+{
+  echo  N${1}_node-$2
+}
+
+# arg1 : namespace
+# arg2 : laninterface
+# arg3 : node id
+function __on_ns_exec()
+{
+    ip netns exec $1 tipc-config -a=1.1.$3 
+    ip netns exec $1 tipc-config -be=eth:$2 
+    ip netns exec $1 tipc-config -netid=$NETID
+}
+
+# Creates a namespace and assign the tipc address
+# arg1: node id
+function __create_namespace()
+{
+    local nodeid=$1
+    # Create unique namespace
+    ip netns add $(__ns $CLUSTER $nodeid);
+    echo "Namespace:" $(__ns $CLUSTER $nodeid)
+    # Create macvlan interface connected to lan
+    ip link add link $LANIF name $lan type macvlan mode bridge
+    # Associate the namespace to the newly created macvlan interface
+    ip link set $lan netns $(__ns $CLUSTER $nodeid)
+    # Bring up all created interface via their namespace
+    ip netns exec $(__ns $CLUSTER $nodeid) ip link set $lan up
+    # Configure address for each namespace
+    __on_ns_exec $(__ns $CLUSTER $nodeid) $lan $nodeid 
+}
+
+__create_namespace $NODE
