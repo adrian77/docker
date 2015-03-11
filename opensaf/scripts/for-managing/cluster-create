@@ -1,0 +1,84 @@
+#!/bin/bash
+[[ -z $1 ]] && echo Specify number of controllers && exit 1
+[[ -z $2 ]] && echo Specify number of payloads && exit 1
+
+# Default image to instansiate containers from
+image=adrianszwej/opensaf:4.6-ubuntu-14
+
+[[ ! -z $3 ]] && image=$3 
+clustername=default
+
+[[ ! -z $4 ]] && clustername=$4 
+PLs=$1
+SCs=$2
+SFS=/home/adrian/sharedfs/$clustername
+mkdir -p $SFS > /dev/null
+TIPC=yes
+C_OPTS="--env TIPC=$TIPC"
+mkdir -p /var/run/netns > /dev/null
+
+__create_tipc_namespace()
+{
+   local pid=$1
+   local nodeid=$2
+   ln -s /proc/$pid/ns/net /var/run/netns/$pid
+   ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid
+}
+
+__create_container()
+{
+    echo "Creating container $name"
+    docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs $image
+   
+    if [ "$TIPC" = "yes" ]; then
+       PID=`docker inspect -f '{{.State.Pid}}' $1`
+       __create_tipc_namespace $PID ${2/*-}
+    fi
+}
+
+__create_scs()
+{
+	i=0
+	while [ $i -lt $SCs ]; do
+	   i=$(($i + 1))
+	   node=SC-$i 
+	   name=$clustername-SC-$i
+	   docker inspect $name > /dev/null 2>&1
+	   if [ $? -ne 0 ]; then 
+	     __create_container $name $node
+	     #docker-enter $node /home/opensaf/setup-opensaf-node
+	     #docker-enter $node /etc/init.d/opensafd stop
+	     #docker-enter $NODE /etc/init.d/opensafd start
+	   fi
+	done
+}
+
+__create_pls()
+{
+	i=2
+	while [ $i -lt $PLs ]; do
+	   i=$(($i + 1))
+	   node=PL-$i             
+	   name=$clustername-PL-$i
+	   docker inspect $name > /dev/null 2>&1
+	   if [ $? -ne 0 ]; then
+	     __create_container $name $node
+	   fi
+	done
+}
+
+__create_scs 
+__create_pls
+
+
+exit 0
+   running=`docker inspect --format {{.State.Running}} $NODE`
+   if [ $running = "false" ]; then
+     echo "Starting $NODE"
+     docker start $NODE
+     docker-enter $NODE /home/opensaf/setup-opensaf-node
+     docker-enter $NODE /etc/init.d/opensafd stop
+     docker-enter $NODE /etc/init.d/opensafd start
+   else
+     echo "$NODE was already running"
+   fi

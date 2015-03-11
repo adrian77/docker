@@ -1,0 +1,5 @@
+docker-ps | grep " PL-" | cut -d "L" -f2 | cut -d " " -f1 | xargs -I {} bash -c "docker-enter PL{} /etc/init.d/opensafd stop"
+if [ "$1" = "all" ]; then
+  echo "Stoppping also controllers"
+  docker-ps | grep " SC-" | cut -d "C" -f2 | cut -d " " -f1 | xargs -I {} bash -c "docker-enter SC{} /etc/init.d/opensafd stop"
+fi

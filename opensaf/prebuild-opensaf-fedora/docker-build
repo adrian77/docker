@@ -1,0 +1,7 @@
+#!/bin/bash
+# Support script for docker
+#
+
+. ../../bin/for-docker/common-routines
+
+docker build -t="adrianszwej/opensaf:4.6-fedora-21" . 

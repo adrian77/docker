@@ -1,0 +1,60 @@
+#!/bin/bash
+clustername=default
+[[ ! -z $1 ]] && clustername=$1 
+SFS=/home/adrian/sharedfs/$clustername
+SCs=2
+PLs=10
+
+__create_container()
+{
+    echo "Destroying container $name"
+   
+    #if [ "$TIPC" = "yes" ]; then
+       PID=`docker inspect -f '{{.State.Pid}}' $1`
+       ../../../bin/for-docker/tipc-namespace-teardown $PID
+    #fi
+    #perhaps graceful shutdown
+    docker stop $1
+    docker rm 
+}
+
+__create_scs()
+{
+	i=0
+	while [ $i -lt $SCs ]; do
+	   i=$(($i + 1))
+	   node=SC-$i 
+	   name=$clustername-SC-$i
+	   docker inspect $name > /dev/null 2>&1
+	   if [ $? -eq 0 ]; then 
+	     __create_container $name $node
+	     #docker-enter $node /home/opensaf/setup-opensaf-node
+	     #docker-enter $node /etc/init.d/opensafd stop
+	     #docker-enter $NODE /etc/init.d/opensafd start
+	   fi
+	done
+}
+
+__create_pls()
+{
+	i=2
+	while [ $i -lt $PLs ]; do
+	   i=$(($i + 1))
+	   node=PL-$i             
+	   name=$clustername-PL-$i
+	   docker inspect $name > /dev/null 2>&1
+	   if [ $? -eq 0 ]; then
+	     __create_container $name $node
+	   fi
+	done
+}
+
+__create_scs 
+__create_pls
+exit 0
+docker-ps | grep " PL-" | cut -d "L" -f2 | cut -d " " -f1 | xargs -I {} bash -c "docker stop PL{} && docker rm PL{}"
+if [ "$1" = "all" ]; then
+  echo "Deleted also controllers"
+  docker-ps | grep " SC-" | cut -d "C" -f2 | cut -d " " -f1 | xargs -I {} bash -c "docker stop SC{} && docker rm SC{}"
+fi
+
