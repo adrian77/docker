@@ -3,7 +3,7 @@ clustername=default
 [[ ! -z $1 ]] && clustername=$1 
 SFS=/home/adrian/sharedfs/$clustername
 SCs=2
-PLs=10
+PLs=200
 
 __create_container()
 {
@@ -11,11 +11,11 @@ __create_container()
    
     #if [ "$TIPC" = "yes" ]; then
        PID=`docker inspect -f '{{.State.Pid}}' $1`
-       ../../../bin/for-docker/tipc-namespace-teardown $PID
+       [[ $? -eq 0 ]] && ../../../bin/for-docker/tipc-namespace-teardown $PID
     #fi
     #perhaps graceful shutdown
     docker stop $1
-    docker rm 
+    docker rm $1
 }
 
 __create_scs()

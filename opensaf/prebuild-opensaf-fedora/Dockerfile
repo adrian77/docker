@@ -55,13 +55,11 @@ RUN yum -y install mercurial gcc gcc-c++ libxml2-devel automake m4 autoconf libt
     echo "# Remove development packages" && \
     yum remove -y mercurial gcc gcc-c++ libxml2-devel automake m4 autoconf libtool pkg-config make python-devel sqlite-devel && \
     yum autoremove -y && \
-    yum install redhat-lsb-core -y && \
     rm -rf /home/opensaf/download-opensaf && \
     rm -rf /home/opensaf/configure-opensaf-basic && \
     rm -rf /home/opensaf/install-opensaf && \
     yum clean all
 
-# Pass configuration for utility scripts
 ENV container docker
 
 CMD ["/bin/bash"]

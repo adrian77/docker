@@ -12,7 +12,6 @@ clustername=default
 
 SCs=$1
 PLs=$2
-offset=50
 
 SFS=/home/adrian/sharedfs/$clustername
 mkdir -p $SFS > /dev/null
@@ -30,12 +29,15 @@ __create_tipc_namespace()
 
 __create_container()
 {
-    echo "Creating container $name"
-    docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs $image
+#    docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs $image
    
     if [ "$TIPC" = "yes" ]; then
        PID=`docker inspect -f '{{.State.Pid}}' $1`
-       __create_tipc_namespace $PID ${2/*-}
+       address=`ip netns exec $PID tipc-config -a`
+
+       up=`ip netns exec $PID tipc-config -l | grep ": up" | wc -l`
+       down=`ip netns exec $PID tipc-config -l | grep ": down" | wc -l`
+       echo "$1. Address: $address. Links up: $up. Links down: $down"
     fi
 }
 
@@ -47,7 +49,7 @@ __create_scs()
 	   node=SC-$i 
 	   name=$clustername-SC-$i
 	   docker inspect $name > /dev/null 2>&1
-	   if [ $? -ne 0 ]; then 
+	   if [ $? -eq 0 ]; then 
 	     __create_container $name $node
 	     #docker-enter $node /home/opensaf/setup-opensaf-node
 	     #docker-enter $node /etc/init.d/opensafd stop
@@ -58,13 +60,13 @@ __create_scs()
 
 __create_pls()
 {
-	i=$((2 + offset))
-	while [ $i -lt $((PLs + offset + 2)) ]; do
+	i=2
+	while [ $i -lt $PLs ]; do
 	   i=$(($i + 1))
 	   node=PL-$i             
 	   name=$clustername-PL-$i
 	   docker inspect $name > /dev/null 2>&1
-	   if [ $? -ne 0 ]; then
+	   if [ $? -eq 0 ]; then
 	     __create_container $name $node
 	   fi
 	done
