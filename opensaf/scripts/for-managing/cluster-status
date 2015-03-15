@@ -2,19 +2,15 @@
 [[ -z $1 ]] && echo Specify number of controllers && exit 1
 [[ -z $2 ]] && echo Specify number of payloads && exit 1
 
-# Default image to instansiate containers from
-image=adrianszwej/opensaf:4.6-ubuntu-14
-
 [[ ! -z $3 ]] && image=$3 
-clustername=default
 
+clustername=default
 [[ ! -z $4 ]] && clustername=$4 
 
 SCs=$1
 PLs=$2
 
 SFS=/home/adrian/sharedfs/$clustername
-mkdir -p $SFS > /dev/null
 TIPC=yes
 C_OPTS="--env TIPC=$TIPC"
 mkdir -p /var/run/netns > /dev/null
@@ -51,9 +47,6 @@ __create_scs()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -eq 0 ]; then 
 	     __create_container $name $node
-	     #docker-enter $node /home/opensaf/setup-opensaf-node
-	     #docker-enter $node /etc/init.d/opensafd stop
-	     #docker-enter $NODE /etc/init.d/opensafd start
 	   fi
 	done
 }

@@ -1,5 +1,10 @@
 #!/bin/bash
 # Node configuration script for opensaf node
+#
+# @version: 1.2
+#   added container configuration file support
+#   added tipc network prefix
+#   added tipc_manage configuration options to indicate if container should set the tipc address
 # @version: 1.1
 #   added tipc configuration support
 # @version: 1.0
@@ -8,15 +13,19 @@
 # @Author: Adrian Szwej <adrian.szwej@gmail.com>
 
 iface=eth0
+controllers=2
 payloads=8
-[[ -z $TIPC ]] && TIPC=no
 
 #tipc configuration
 tipc_netid=1234
+tipc_prefix=1.1
 tipc_be=eth:$iface
-
+tipc_manage=yes
 #tcp configuration
 mcast=224.0.0.6
+
+[[ -z $TIPC ]] && TIPC=no
+[[ -f /etc/container.env ]] && source /etc/container.env
 
 # For some reason -disable-ais-plm does not work on fedora
 sed -e 's/^\/usr\/local\/lib\/opensaf\/clc-cli\/osaf-plmd\:PLMD/#\/usr\/local\/lib\/opensaf\/clc-cli\/osaf-plmd\:PLMD/' -i /etc/opensaf/nodeinit.conf.controller
@@ -49,9 +58,11 @@ if [ "$TIPC" = "yes" ]; then
   sed 's/export MDS_TRANSPORT=TCP/export MDS_TRANSPORT=TIPC/' -i /etc/opensaf/nid.conf
   sed s/TIPC_ETH_IF=eth0/TIPC_ETH_IF=$iface/ -i /etc/opensaf/nid.conf
   sed s/TIPC_NET_ID=1234/TIPC_NET_ID=$tipc_netid/ -i /etc/opensaf/nid.conf
-  tipc-config -netid=$tipc_netid
-  tipc-config -a=1.1.`cat /etc/opensaf/slot_id`
-  tipc-config -be=$tipc_be
+  if [ "${tipc_manage}" = "yes" ]; then
+    tipc-config -netid=$tipc_netid
+    tipc-config -a=${tipc_prefix}.`cat /etc/opensaf/slot_id`
+    tipc-config -be=$tipc_be
+  fi
 else
   ip=`ifconfig $iface | grep inet | grep -v inet6 | grep -Po '(?<=(inet )|(inet addr:))[0-9].*' | cut -d " " -f1`
   sed s/DTM_NODE_IP=.*/DTM_NODE_IP=$ip/ -i /etc/opensaf/dtmd.conf
@@ -71,7 +82,7 @@ if [ $(cat /etc/opensaf/node_type) = "controller" ]; then
   if [ ! -f $immdir/imm.xml ]; then
     cd /usr/local/share/opensaf/immxml
     rm -f imm.xml.*
-    ./immxml-clustersize -s 2 -p $payloads
+    ./immxml-clustersize -s $controllers -p $payloads
     ./immxml-configure
     cp imm.xml.* $immdir/imm.xml
     # Enable Persistent Backend

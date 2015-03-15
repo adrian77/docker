@@ -4,6 +4,7 @@
 
 # Default image to instansiate containers from
 image=adrianszwej/opensaf:4.6-ubuntu-14
+cmd="/etc/init.d/opensafd start"
 
 [[ ! -z $3 ]] && image=$3 
 clustername=default
@@ -12,12 +13,20 @@ clustername=default
 
 SCs=$1
 PLs=$2
-offset=50
+# If TIPC address should be set outside the container
+tipc_manage=no
 
-SFS=/home/adrian/sharedfs/$clustername
+[[ ! -z $OFFSET ]] && offset=0
+[[ ! -z $STORAGE ]] && STORAGE=~/sharedfs
+SFS=$STORAGEs/$clustername
+
+cp ../for-running/etc/container.env $SFS
+cp ../for-running/home/opensaf/setup-opensaf-node $SFS
 mkdir -p $SFS > /dev/null
-TIPC=yes
+
+[[ -z $TIPC ]] && TIPC=yes
 C_OPTS="--env TIPC=$TIPC"
+
 mkdir -p /var/run/netns > /dev/null
 
 __create_tipc_namespace()
@@ -25,13 +34,14 @@ __create_tipc_namespace()
    local pid=$1
    local nodeid=$2
    ln -s /proc/$pid/ns/net /var/run/netns/$pid
-   ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid
+   ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid $tipc_manage
 }
 
 __create_container()
 {
     echo "Creating container $name"
-    docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs $image
+
+    docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs -v $SFS/container.env:/etc/container.env -v $SFS/setup-opensaf-node:/home/opensaf/setup-opensaf-node $image
    
     if [ "$TIPC" = "yes" ]; then
        PID=`docker inspect -f '{{.State.Pid}}' $1`
@@ -49,9 +59,7 @@ __create_scs()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then 
 	     __create_container $name $node
-	     #docker-enter $node /home/opensaf/setup-opensaf-node
-	     #docker-enter $node /etc/init.d/opensafd stop
-	     #docker-enter $NODE /etc/init.d/opensafd start
+             docker exec $name $cmd
 	   fi
 	done
 }
@@ -66,6 +74,7 @@ __create_pls()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then
 	     __create_container $name $node
+             docker exec $name $cmd
 	   fi
 	done
 }

@@ -1,15 +1,14 @@
 #!/bin/bash
-CLUSTER=4711
-lan=mvl_$CLUSTER
-LANIF=eth0
+LAN=intra
 NS=$1
 
-# Creates a namespace and assign the tipc address
-# arg1: node id
+# Delete a namespace
+# arg1: namespace name
 function __delete_namespace()
 {
-    ip netns exec $NS ip link set $lan down
-    ip netns del $NS 
+    local ns=$1
+    ip netns exec $ns ip link set $LAN down > /dev/null
+    ip netns del $ns > /dev/null 
 }
 
 __delete_namespace $NS
