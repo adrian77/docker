@@ -16,13 +16,15 @@ PLs=$2
 # If TIPC address should be set outside the container
 tipc_manage=no
 
-[[ ! -z $OFFSET ]] && offset=0
-[[ ! -z $STORAGE ]] && STORAGE=~/sharedfs
-SFS=$STORAGEs/$clustername
+[[ -z $OFFSET ]] && offset=0
+[[ -z $STORAGE ]] && STORAGE=~/sharedfs
+SFS=$STORAGE/$clustername
+mkdir -p $SFS > /dev/null
 
+# To be removed for final version
 cp ../for-running/etc/container.env $SFS
 cp ../for-running/home/opensaf/setup-opensaf-node $SFS
-mkdir -p $SFS > /dev/null
+
 
 [[ -z $TIPC ]] && TIPC=yes
 C_OPTS="--env TIPC=$TIPC"

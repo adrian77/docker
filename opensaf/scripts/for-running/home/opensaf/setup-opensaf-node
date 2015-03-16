@@ -21,6 +21,7 @@ tipc_netid=1234
 tipc_prefix=1.1
 tipc_be=eth:$iface
 tipc_manage=yes
+tipc_multicast=no
 #tcp configuration
 mcast=224.0.0.6
 
@@ -56,6 +57,7 @@ hostname > /etc/opensaf/node_name
 
 if [ "$TIPC" = "yes" ]; then
   sed 's/export MDS_TRANSPORT=TCP/export MDS_TRANSPORT=TIPC/' -i /etc/opensaf/nid.conf
+  [[ "$tipc_multicast" = "no" ]] && sed 's/export MDS_TIPC_MCAST_ENABLED=1/export MDS_TIPC_MCAST_ENABLED=0/' -i /etc/opensaf/nid.conf
   sed s/TIPC_ETH_IF=eth0/TIPC_ETH_IF=$iface/ -i /etc/opensaf/nid.conf
   sed s/TIPC_NET_ID=1234/TIPC_NET_ID=$tipc_netid/ -i /etc/opensaf/nid.conf
   if [ "${tipc_manage}" = "yes" ]; then

@@ -1,82 +1,29 @@
 #!/bin/bash
-[[ -z $1 ]] && echo Specify number of controllers && exit 1
-[[ -z $2 ]] && echo Specify number of payloads && exit 1
-
-[[ ! -z $3 ]] && image=$3 
+# Cluster management cluster
+# - provides status of the cluster instances 
 
 clustername=default
-[[ ! -z $4 ]] && clustername=$4 
+[[ ! -z $1 ]] && clustername=$1 
+SFS=~/sharedfs/$clustername
 
-SCs=$1
-PLs=$2
-
-SFS=/home/adrian/sharedfs/$clustername
-TIPC=yes
-C_OPTS="--env TIPC=$TIPC"
-mkdir -p /var/run/netns > /dev/null
-
-__create_tipc_namespace()
+__get_containers()
 {
-   local pid=$1
-   local nodeid=$2
-   ln -s /proc/$pid/ns/net /var/run/netns/$pid
-   ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid
+   docker ps -a | grep -o "${clustername}-[PS][LC]-[0-9]*" 
 }
 
-__create_container()
+__destroy_containers()
 {
-#    docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs $image
-   
-    if [ "$TIPC" = "yes" ]; then
-       PID=`docker inspect -f '{{.State.Pid}}' $1`
-       address=`ip netns exec $PID tipc-config -a`
+   for name in $@; do
+      pid=`docker inspect -f '{{.State.Pid}}' $name`
+      address=`ip netns exec $pid tipc-config -a | grep -o "<.*>"`
 
-       up=`ip netns exec $PID tipc-config -l | grep ": up" | wc -l`
-       down=`ip netns exec $PID tipc-config -l | grep ": down" | wc -l`
-       echo "$1. Address: $address. Links up: $up. Links down: $down"
-    fi
+      up=`ip netns exec $pid tipc-config -l | grep ": up" | wc -l`
+      down=`ip netns exec $pid tipc-config -l | grep ": down" | wc -l`
+      echo "$name $address LinksUp: $up. LinksDown: $down"
+   done
 }
 
-__create_scs()
-{
-	i=0
-	while [ $i -lt $SCs ]; do
-	   i=$(($i + 1))
-	   node=SC-$i 
-	   name=$clustername-SC-$i
-	   docker inspect $name > /dev/null 2>&1
-	   if [ $? -eq 0 ]; then 
-	     __create_container $name $node
-	   fi
-	done
-}
+__destroy_containers $(__get_containers)
 
-__create_pls()
-{
-	i=2
-	while [ $i -lt $PLs ]; do
-	   i=$(($i + 1))
-	   node=PL-$i             
-	   name=$clustername-PL-$i
-	   docker inspect $name > /dev/null 2>&1
-	   if [ $? -eq 0 ]; then
-	     __create_container $name $node
-	   fi
-	done
-}
-
-__create_scs 
-__create_pls
-
-
-exit 0
-   running=`docker inspect --format {{.State.Running}} $NODE`
-   if [ $running = "false" ]; then
-     echo "Starting $NODE"
-     docker start $NODE
-     docker-enter $NODE /home/opensaf/setup-opensaf-node
-     docker-enter $NODE /etc/init.d/opensafd stop
-     docker-enter $NODE /etc/init.d/opensafd start
-   else
-     echo "$NODE was already running"
-   fi
+# delete the sharedfs
+rm -rf $SFS > /dev/null
