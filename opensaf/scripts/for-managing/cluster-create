@@ -16,7 +16,7 @@ PLs=$2
 # If TIPC address should be set outside the container
 tipc_manage=no
 
-[[ -z $OFFSET ]] && offset=0
+[[ -z $OFFSET ]] && OFFSET=0
 [[ -z $STORAGE ]] && STORAGE=~/sharedfs
 SFS=$STORAGE/$clustername
 mkdir -p $SFS > /dev/null
@@ -24,7 +24,6 @@ mkdir -p $SFS > /dev/null
 # To be removed for final version
 cp ../for-running/etc/container.env $SFS
 cp ../for-running/home/opensaf/setup-opensaf-node $SFS
-
 
 [[ -z $TIPC ]] && TIPC=yes
 C_OPTS="--env TIPC=$TIPC"
@@ -36,7 +35,7 @@ __create_tipc_namespace()
    local pid=$1
    local nodeid=$2
    ln -s /proc/$pid/ns/net /var/run/netns/$pid
-   ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid $tipc_manage
+   #../../../bin/for-docker/tipc-namespace-setup $pid $nodeid $tipc_manage
 }
 
 __create_container()
@@ -61,30 +60,29 @@ __create_scs()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then 
 	     __create_container $name $node
-             sleep 1
-             docker exec $name $cmd
+             sleep 1  
+             #docker exec $name $cmd
 	   fi
 	done
 }
 
 __create_pls()
 {
-	i=$((2 + offset))
-	while [ $i -lt $((PLs + offset + 2)) ]; do
+	i=$((2 + OFFSET))
+	while [ $i -lt $((PLs + OFFSET + 2)) ]; do
 	   i=$(($i + 1))
 	   node=PL-$i             
 	   name=$clustername-PL-$i
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then
 	     __create_container $name $node
-             sleep 1
-             docker exec $name $cmd
+             sleep 1 
+             #docker exec $name $cmd
 	   fi
 	done
 }
 
 __create_scs 
 __create_pls
-
 
 exit 0
