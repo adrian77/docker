@@ -61,6 +61,7 @@ __create_scs()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then 
 	     __create_container $name $node
+             sleep 1
              docker exec $name $cmd
 	   fi
 	done
@@ -76,6 +77,7 @@ __create_pls()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then
 	     __create_container $name $node
+             sleep 1
              docker exec $name $cmd
 	   fi
 	done
@@ -86,13 +88,3 @@ __create_pls
 
 
 exit 0
-   running=`docker inspect --format {{.State.Running}} $NODE`
-   if [ $running = "false" ]; then
-     echo "Starting $NODE"
-     docker start $NODE
-     docker-enter $NODE /home/opensaf/setup-opensaf-node
-     docker-enter $NODE /etc/init.d/opensafd stop
-     docker-enter $NODE /etc/init.d/opensafd start
-   else
-     echo "$NODE was already running"
-   fi
