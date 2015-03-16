@@ -11,7 +11,7 @@ __get_containers()
    docker ps -a | grep -o "${clustername}-[PS][LC]-[0-9]*" 
 }
 
-__destroy_containers()
+__status_containers()
 {
    for name in $@; do
       pid=`docker inspect -f '{{.State.Pid}}' $name`
@@ -23,7 +23,4 @@ __destroy_containers()
    done
 }
 
-__destroy_containers $(__get_containers)
-
-# delete the sharedfs
-rm -rf $SFS > /dev/null
+__status_containers $(__get_containers)
