@@ -28,7 +28,7 @@ cp ../for-running/home/opensaf/setup-opensaf-node $SFS
 mkdir -p /var/run/netns > /dev/null
 __check_tipc_module()
 {
-   lsmod | grep tipc || echo "TIPC module is not loaded" && exit 1
+   lsmod | grep tipc > /dev/null || (echo "TIPC module is not loaded" && exit 1)
 }
 
 [[ -z $TIPC ]] && TIPC=yes && __check_tipc_module
