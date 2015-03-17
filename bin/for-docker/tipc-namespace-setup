@@ -29,10 +29,13 @@ function __setup_namespace()
 
     # Create macvlan interface connected to lan
     ip link add link $LANIF name $lan type macvlan mode bridge
+    [[ $? -eq 0 ]] || echo "Link add failed!"
     # Associate the namespace to the newly created macvlan interface
     ip link set $lan netns $ns 
+    [[ $? -eq 0 ]] || echo "Link namespace set failed!"
     # Bring up all created interface via their namespace
     ip netns exec $ns ip link set $lan up
+    [[ $? -eq 0 ]] || echo "Link set up failed!"
     # Configure address for each namespace
     [[ "$manage" = "yes" ]] &&  __on_ns_exec $ns $lan $nodeid 
 }

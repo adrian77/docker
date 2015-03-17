@@ -35,7 +35,7 @@ __create_tipc_namespace()
    local pid=$1
    local nodeid=$2
    ln -s /proc/$pid/ns/net /var/run/netns/$pid
-   #../../../bin/for-docker/tipc-namespace-setup $pid $nodeid $tipc_manage
+   ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid $tipc_manage
 }
 
 __create_container()
