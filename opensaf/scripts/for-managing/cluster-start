@@ -1,0 +1,107 @@
+#!/bin/bash
+[[ -z $1 ]] && echo Specify number of controllers && exit 1
+[[ -z $2 ]] && echo Specify number of payloads && exit 1
+
+# Default image to instansiate containers from
+image=adrianszwej/opensaf:4.6-ubuntu-14
+cmd="/etc/init.d/opensafd start"
+
+[[ ! -z $3 ]] && image=$3 
+clustername=default
+
+[[ ! -z $4 ]] && clustername=$4 
+
+SCs=$1
+PLs=$2
+# If TIPC address should be set outside the container
+tipc_manage=no
+
+[[ -z $OFFSET ]] && OFFSET=0
+[[ -z $STORAGE ]] && STORAGE=~/sharedfs
+SFS=$STORAGE/$clustername
+mkdir -p $SFS > /dev/null
+
+# To be removed for final version
+cp ../for-running/etc/container.env $SFS
+cp ../for-running/home/opensaf/setup-opensaf-node $SFS
+
+[[ -z $TIPC ]] && TIPC=yes
+C_OPTS="--env TIPC=$TIPC"
+
+mkdir -p /var/run/netns > /dev/null
+
+__create_tipc_namespace()
+{
+   local pid=$1
+   local nodeid=$2
+   ln -s /proc/$pid/ns/net /var/run/netns/$pid
+   ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid $tipc_manage
+}
+
+__create_container()
+{
+    echo "Creating container $name"
+
+    docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs -v $SFS/container.env:/etc/container.env -v $SFS/setup-opensaf-node:/home/opensaf/setup-opensaf-node $image
+   
+    if [ "$TIPC" = "yes" ]; then
+       PID=`docker inspect -f '{{.State.Pid}}' $1`
+       __create_tipc_namespace $PID ${2/*-}
+    fi
+}
+
+__start_container()
+{
+           local name=$1
+           PID=`docker inspect -f '{{.State.Pid}}' $name`
+           if [ $? -eq 0 ]; then
+             if [ "$PID" = "0" ]; then
+                #container is not running
+                docker start $name
+                if [ "$TIPC" = "yes" ]; then
+                  PID=`docker inspect -f '{{.State.Pid}}' $name`
+                  [[ "$PID" -ne "0" ]] && __create_tipc_namespace $PID ${2/*-}
+                fi
+             else
+               #check if opensaf is running. Now we only test if TIPC address is set which might be wrong in case the address is set outside the container
+               ip netns exec $PID tipc-config -a | grep -o "<0.0.0>" > /dev/null 
+               if [ $? -eq 0 ];then
+                 sleep 1
+                 docker exec $name $cmd
+               else
+                 echo "$name:OpenSAF is running"
+               fi
+             fi
+           else
+             #container does not exist
+             #__create_container $name $node
+             echo "Container $name does not exist"
+           fi
+}
+
+__create_scs()
+{
+	i=0
+	while [ $i -lt $SCs ]; do
+	   i=$(($i + 1))
+	   node=SC-$i 
+	   name=$clustername-SC-$i
+           __start_container $name $node
+	done
+}
+
+__create_pls()
+{
+	i=$((2 + OFFSET))
+	while [ $i -lt $((PLs + OFFSET + 2)) ]; do
+	   i=$(($i + 1))
+	   node=PL-$i             
+	   name=$clustername-PL-$i
+           __start_container $name
+	done
+}
+
+__create_scs 
+__create_pls
+
+exit 0
