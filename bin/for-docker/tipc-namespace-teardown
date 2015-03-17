@@ -8,7 +8,7 @@ function __delete_namespace()
 {
     local ns=$1
     ip netns exec $ns ip link set $LAN down > /dev/null 2>&1
-    ip netns del $ns > /dev/null 
+    ip netns del $ns > /dev/null 2>&1
 }
 
 __delete_namespace $NS

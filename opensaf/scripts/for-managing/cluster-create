@@ -25,10 +25,14 @@ mkdir -p $SFS > /dev/null
 cp ../for-running/etc/container.env $SFS
 cp ../for-running/home/opensaf/setup-opensaf-node $SFS
 
-[[ -z $TIPC ]] && TIPC=yes
-C_OPTS="--env TIPC=$TIPC"
-
 mkdir -p /var/run/netns > /dev/null
+__check_tipc_module()
+{
+   lsmod | grep tipc || echo "TIPC module is not loaded" && exit 1
+}
+
+[[ -z $TIPC ]] && TIPC=yes && __check_tipc_module
+C_OPTS="--env TIPC=$TIPC"
 
 __create_tipc_namespace()
 {
@@ -60,8 +64,8 @@ __create_scs()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then 
 	     __create_container $name $node
-             sleep 1  
-             #docker exec $name $cmd
+             #sleep 1  
+             docker exec $name $cmd
 	   fi
 	done
 }
@@ -76,8 +80,8 @@ __create_pls()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then
 	     __create_container $name $node
-             sleep 1 
-             #docker exec $name $cmd
+             #sleep 1 
+             docker exec $name $cmd
 	   fi
 	done
 }
