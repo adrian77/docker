@@ -10,17 +10,18 @@ MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 # sudo nsenter --target $PID --mount --uts --ipc --net --pid 
 #
 # Shared fs if you have two controllers. The setup-opensaf-node will check for this dir and use that instead.
-# Additional use -v /home/adrian/sharedfs:/etc/opensaf/sharedfs and then configure IMM PBE to use this directory persisting IMM data
+# Additional use -v $HOME/sharedfs:/etc/opensaf/sharedfs and then configure IMM PBE to use this directory persisting IMM data
 #
 
 # make sure the package repository is up to date
-#RUN yum -y update
+RUN ls -la /
+RUN yum -y update
 
 # Packages for usuability
 RUN yum -y install vim && yum clean all
 
 # Packages needed for OpenSAF runtime 
-RUN yum -y install net-tools sqlite3 libxml2 redhat-lsb-core && \
+RUN yum -y install net-tools sqlite3 libxml2 redhat-lsb-core initscripts && \
     yum clean all
 
 RUN groupadd opensaf && \
@@ -43,22 +44,23 @@ ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for
 
 RUN chmod u+x /home/opensaf/*
 
-# Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead.
+# Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.6.x | opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead.
 RUN yum -y install mercurial gcc gcc-c++ libxml2-devel automake m4 autoconf libtool pkg-config make python-devel sqlite-devel && \
     yum clean all && \
     echo "# Build OpenSAF" && \
     cd /home/opensaf && \
     ./download-opensaf && \
-    ./configure-opensaf-basic default && \
+    ./configure-opensaf-basic opensaf-4.6.x && \
     ./install-opensaf && \
     rm -rf /home/opensaf/opensaf-* && \
     echo "# Remove development packages" && \
     yum remove -y mercurial gcc gcc-c++ libxml2-devel automake m4 autoconf libtool pkg-config make python-devel sqlite-devel && \
-    yum autoremove -y && \
+    yum install -y redhat-lsb-core && \ 
     rm -rf /home/opensaf/download-opensaf && \
     rm -rf /home/opensaf/configure-opensaf-basic && \
     rm -rf /home/opensaf/install-opensaf && \
-    yum clean all
+    yum clean all && \
+    sed '/\. \/lib\/lsb\/init-functions/ a\\/home\/opensaf\/setup-opensaf-node' -i /etc/init.d/opensafd
 
 ENV container docker
 
