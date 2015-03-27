@@ -41,6 +41,7 @@ immdir=/etc/opensaf
 if [ -d /etc/opensaf/sharedfs ]; then
   immdir=/etc/opensaf/sharedfs
   sed s/^export.IMMSV_ROOT_DIRECTORY=.*/"export IMMSV_ROOT_DIRECTORY=\/etc\/opensaf\/sharedfs"/ -i /etc/opensaf/immnd.conf
+  sed s/^export IMMSV_MAX_WAIT=.*/export IMMSV_MAX_WAIT=0/ -i /etc/opensaf/immnd.conf
 fi
 
 # Host specific configuration

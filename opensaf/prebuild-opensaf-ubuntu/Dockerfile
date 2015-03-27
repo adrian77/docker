@@ -44,13 +44,13 @@ RUN apt-get install -y vim && \
 RUN apt-get install -y sudo sqlite3 libxml2 psmisc python && \
     apt-get clean  
 
-# Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
+# Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.6.x | opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
 RUN apt-get install -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtool pkg-config make python-dev libsqlite3-dev && \
     apt-get clean && \
     echo "# Download and build OpenSAF" && \
     cd /home/opensaf && \
     ./download-opensaf && \
-    ./configure-opensaf-basic default && \
+    ./configure-opensaf-basic opensaf-4.6.x && \
     ./install-opensaf && \ 
     rm -rf /home/opensaf/opensaf-* && \
     echo "# Remove development packages" && \
