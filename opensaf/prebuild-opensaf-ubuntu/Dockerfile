@@ -31,7 +31,8 @@ ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc-config /sbin/tipc-config
 
-RUN chmod u+x /home/opensaf/*
+RUN chmod u+x /home/opensaf/* && \
+    chmod u+x /sbin/tipc-config
 
 # make sure the package repository is up to date
 RUN apt-get update
