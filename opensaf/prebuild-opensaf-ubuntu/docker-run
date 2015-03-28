@@ -3,18 +3,21 @@ NODE=SC-1
 [[ ! -z $1 ]] && NODE=$1
 NAME=$NODE
 [[ ! -z $2 ]] && NAME=$2-$NODE
-IMAGE=adrianszwej/opensaf:4.6-ubuntu-14
+IMAGE=adrianszwej/opensaf:4.6.FC-ubuntu-14
+[[ -z $TIPC ]] && TIPC=no
 
 # create tipc namespace
-if [ $? -eq 0 ]; then
-  docker run --privileged -t -d -h $NODE --name $NAME --env TIPC=yes -v /home/adrian/sharedfs:/etc/opensaf/sharedfs -i $IMAGE 
-  [[ $? -ne 0 ]] && exit 1
+docker run --privileged -t -d -h $NODE --name $NAME --env TIPC=$TIPC -v $HOME/sharedfs:/etc/opensaf/sharedfs -i $IMAGE 
+[[ $? -ne 0 ]] && exit 1
+
+if [ "$TIPC" = "yes" ]; then 
+  PID=`docker inspect -f '{{.State.Pid}}' $NAME`
+  echo PID of container is $PID
+
+  # Make visible namespace for the ip command
+  mkdir -p /var/run/netns > /dev/null
+  ln -s /proc/$PID/ns/net /var/run/netns/$PID
+  ../../bin/for-docker/tipc-namespace-setup $PID ${NODE/*-} 
 fi
 
-PID=`docker inspect -f '{{.State.Pid}}' $NAME`
-echo PID of container is $PID
-
-# Make visible namespace for the ip command
-mkdir -p /var/run/netns > /dev/null
-ln -s /proc/$PID/ns/net /var/run/netns/$PID
-../../bin/for-docker/tipc-namespace-setup $PID ${NODE/*-} 
+docker attach $NAME

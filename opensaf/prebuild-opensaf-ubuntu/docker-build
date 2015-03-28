@@ -7,4 +7,4 @@ echo Building with version $VERSION
 
 . ../../bin/for-docker/common-routines
 
-docker build --no-cache -t="adrianszwej/opensaf:$VERSION-ubuntu-14" . 
+docker build -t="adrianszwej/opensaf:$VERSION-ubuntu-14" . 
