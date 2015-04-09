@@ -4,4 +4,4 @@ branch=default
 [[ ! -z $1 ]] && branch=$1
 hg update $branch
 ./bootstrap.sh
-./configure --enable-imm-pbe --disable-ais-plm --disable-ais-msg --disable-ais-lck --disable-ais-evt --disable-rpm-target --enable-tipc
+./configure --enable-imm-pbe --disable-ais-plm --disable-ais-msg --disable-ais-lck --disable-ais-evt --disable-ais-ckpt --disable-rpm-target --enable-tipc
