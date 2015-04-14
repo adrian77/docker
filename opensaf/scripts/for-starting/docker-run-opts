@@ -1,0 +1,39 @@
+#!/bin/bash
+# Base script for running container with support to override with options
+
+HOST=SC-1
+ENV_VARS=""
+
+while getopts ":i:n:h:pt:c:" opt; do
+  case $opt in
+    i)
+      IMAGE=$OPTARG
+      ;;
+    n)
+      NAME=$OPTARG
+      ;;
+    h)
+      HOST=$OPTARG
+      ;;
+    p)
+      PRIV="--privileged"
+      ;;
+    c)
+      CMD="$OPTARG"
+      ;;
+    t)
+      TIPC=no
+      [[ "$OPTARG" = "yes" ]] && TIPC="yes"
+      ENV_VARS="--env TIPC=$TIPC"
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+[[ -z $NAME ]] && NAME=$HOST
