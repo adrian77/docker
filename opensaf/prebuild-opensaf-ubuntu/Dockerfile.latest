@@ -1,0 +1,2 @@
+FROM adrianszwej/opensaf:4.6-ubuntu-14
+MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
