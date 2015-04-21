@@ -3,8 +3,9 @@
 [[ -z $2 ]] && echo Specify number of payloads && exit 1
 
 # Default image to instansiate containers from
-image=adrianszwej/opensaf:4.6-ubuntu-14
+image=adrianszwej/opensaf:latest-ubuntu-14
 cmd="/etc/init.d/opensafd start"
+NETPREFIX=1.1
 
 [[ ! -z $3 ]] && image=$3 
 clustername=default
@@ -37,7 +38,7 @@ C_OPTS="--env TIPC=$TIPC"
 __create_tipc_namespace()
 {
    local pid=$1
-   local nodeid=$2
+   local nodeid=${NETPREFIX}.$2
    ln -s /proc/$pid/ns/net /var/run/netns/$pid
    ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid $tipc_manage
 }
@@ -64,7 +65,6 @@ __create_scs()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then 
 	     __create_container $name $node
-             #sleep 1  
              docker exec $name $cmd
 	   fi
 	done
@@ -80,7 +80,6 @@ __create_pls()
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then
 	     __create_container $name $node
-             #sleep 1 
              docker exec $name $cmd
 	   fi
 	done
