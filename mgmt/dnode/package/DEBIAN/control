@@ -1,0 +1,15 @@
+Package: docker-node-agent 
+Source: no-source 
+Version: 1.0
+Architecture: all
+Maintainer: Adrian Szwej <adrian.szwej@gmail.com>
+Installed-Size: 1
+Depends: ruby1.8 (>> 1.8.7.334-1)
+Suggests: 
+Conflicts:
+Replaces:
+Provides:
+Section: utils
+Priority: optional
+Homepage: http://www.szwej.com/
+Description: Linux OS configuration package for configuring machine for being a docker swarm node. 

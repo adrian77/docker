@@ -1,0 +1,8 @@
+# Reset the docker deamon ID
+[[ -z $1 ]] && echo "You must specify unique hostname" && exit 1
+SERVICE=_dockernode-ssh._tcp
+BROWSE_CMD="avahi-browse --resolve --terminate --parsable --domain local $SERVICE"
+$BROWSE_CMD | grep -E "=.*;IPv4;" | awk -F ';' '{print $4}' | grep $1 > /dev/null && echo "Docker node $1 seem to be already present in the network" && exit 1
+# Check if the hostname is already taken by some other docker node
+rm /etc/docker/key.json
+hostname -b $1
