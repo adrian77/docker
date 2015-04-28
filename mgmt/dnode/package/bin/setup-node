@@ -13,3 +13,6 @@ $BROWSE_CMD | grep -E "=.*;IPv4;" | awk -F ';' '{print $4}' | grep $1 > /dev/nul
 rm /etc/docker/key.json
 hostname -b $1
 /etc/init.d/docker restart
+
+# To republish the new hostname
+/etc/init.d/avahi-daemon restart
