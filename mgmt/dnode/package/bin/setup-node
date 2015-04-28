@@ -1,8 +1,15 @@
-# Reset the docker deamon ID
+#!/bin/bash
+# Script for setting up docker node
+# This must be done on every clone VM
+
 [[ -z $1 ]] && echo "You must specify unique hostname" && exit 1
 SERVICE=_dockernode-ssh._tcp
 BROWSE_CMD="avahi-browse --resolve --terminate --parsable --domain local $SERVICE"
-$BROWSE_CMD | grep -E "=.*;IPv4;" | awk -F ';' '{print $4}' | grep $1 > /dev/null && echo "Docker node $1 seem to be already present in the network" && exit 1
+
 # Check if the hostname is already taken by some other docker node
+$BROWSE_CMD | grep -E "=.*;IPv4;" | awk -F ';' '{print $4}' | grep $1 > /dev/null && echo "Docker node $1 seem to be already present in the network" && exit 1
+
+# Reset the docker deamon ID
 rm /etc/docker/key.json
 hostname -b $1
+/etc/init.d/docker restart
