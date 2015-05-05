@@ -1,0 +1,4 @@
+cd package/
+tree -iAfF --noreport | grep -v '^./DEBIAN' | grep -v '/$' | grep -v '^.$' | xargs md5sum > DEBIAN/md5sums
+cd  ..
+dpkg-deb -b package/ mgmt-setup-1.0_all.deb

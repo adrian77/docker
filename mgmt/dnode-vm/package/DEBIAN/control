@@ -1,4 +1,4 @@
-Package: dnode-agent
+Package: dnode-vm-agent 
 Source: no-source 
 Version: 1.0
 Architecture: all

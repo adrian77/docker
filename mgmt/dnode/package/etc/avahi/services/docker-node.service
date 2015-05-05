@@ -1,0 +1,11 @@
+<?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+
+<service-group>
+  <name replace-wildcards="yes">Docker node 11dff024-1af5-4315-9e8b-a66187ab18e2</name>
+  <service protocol="ipv4">
+    <type>_dockernode-ssh._tcp</type>
+    <port>22</port>
+    <txt-record>default</txt-record>
+  </service>
+</service-group>

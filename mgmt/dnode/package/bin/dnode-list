@@ -4,6 +4,6 @@ SERVICE=_dockernode-ssh._tcp
 USER=docker-admin
 BROWSE_CMD="avahi-browse --resolve --terminate --parsable --domain local $SERVICE"
 
-echo "Listing discovered docker nodes [$SERVICE}"
+echo "Listing discovered docker nodes [$SERVICE]"
 echo "-------------------------------------------"
-$BROWSE_CMD | grep -E "=.*;IPv4;" | awk -F ';' '{print "[Node]: "$4 " on " $8":"$9}'
+$BROWSE_CMD | grep -E "=.*;IPv4;" | awk -F ';' '{print "[" $10 "]: "$4 " on " $8":"$9}'

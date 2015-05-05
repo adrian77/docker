@@ -1,4 +1,7 @@
 cd package/
-tree -iAfF --noreport | grep -v '^./DEBIAN' | grep -v '/$' | grep -v '^.$' | xargs md5sum > DEBIAN/md5sums
+tree -iAfF --noreport | grep -v '^./DEBIAN' | grep -v '/$' | grep -v '^.$' | cut -d "*" -f1 | xargs md5sum > DEBIAN/md5sums
 cd  ..
-dpkg-deb -b package/ mgmt-setup-1.0_all.deb
+p=`grep -Po '(?<=Package: ).*' package/DEBIAN/control`
+v=`grep -Po '(?<=Version: ).*' package/DEBIAN/control`
+a=`grep -Po '(?<=Architecture: ).*' package/DEBIAN/control`
+dpkg-deb -b package/ $p-${v}_${a}.deb
