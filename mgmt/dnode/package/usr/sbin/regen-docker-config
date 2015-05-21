@@ -12,6 +12,6 @@ if [ ! "$OLDUUID" = "UUID" ]; then
    # Reset the docker deamon ID
    rm /etc/docker/key.json
    sed "/<name replace-wildcards=/,/<\/name>/ { s/>.*<\/name/>${SERVICE_DESC_PREFIX}_$UUID<\/name/g; }" -i $SERVICE_FILE
-   sed "/<txt-record>/,/<\/txt-record>/ { s/>.*<\/txt/>$1<\/txt/; }" -i $SERVICE_FILE
+#   sed "/<txt-record>/,/<\/txt-record>/ { s/>.*<\/txt/>$1<\/txt/; }" -i $SERVICE_FILE
    echo $UUID > $UUIDFILE
 fi
