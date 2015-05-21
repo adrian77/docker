@@ -16,7 +16,7 @@ if [ -z $1 ]; then
   exit 1
 fi
 
-sed "/<name replace-wildcards=/,/<\/name>/ { s/>.*<\/name/>${SERVICE_DESC_PREFIX}_`uuidgen`<\/name/g; }" -i $SERVICE_FILE 
+#sed "/<name replace-wildcards=/,/<\/name>/ { s/>.*<\/name/>${SERVICE_DESC_PREFIX}_`uuidgen`<\/name/g; }" -i $SERVICE_FILE 
 sed "/<txt-record>/,/<\/txt-record>/ { s/>.*<\/txt/>$1<\/txt/; }" -i $SERVICE_FILE 
 
 # restart daemon

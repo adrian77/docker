@@ -1,0 +1,17 @@
+#!/bin/bash
+# Script to check if VM has been cloned and automatically reset docker daemon ID to it can create a new one
+SERVICE=_dockernode-ssh._tcp
+SERVICE_FILE=/etc/avahi/services/docker-node.service
+SERVICE_DESC_PREFIX="Dockernode"
+
+UUIDFILE=/etc/docker/uuid 
+UUID=`dmidecode --string system-uuid`
+OLDUUID=`cat $UUIDFILE`
+if [ ! "$OLDUUID" = "UUID" ]; then
+   #machine seem to be different than the orginal one, docker config will be regenerated
+   # Reset the docker deamon ID
+   rm /etc/docker/key.json
+   sed "/<name replace-wildcards=/,/<\/name>/ { s/>.*<\/name/>${SERVICE_DESC_PREFIX}_$UUID<\/name/g; }" -i $SERVICE_FILE
+   sed "/<txt-record>/,/<\/txt-record>/ { s/>.*<\/txt/>$1<\/txt/; }" -i $SERVICE_FILE
+   echo $UUID > $UUIDFILE
+fi

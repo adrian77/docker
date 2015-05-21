@@ -1,0 +1,11 @@
+[Unit]
+Description=Detect cloned docker VM.
+Before=docker.service
+Before=dbus-org.freedesktop.Avahi.service
+
+[Service]
+TimeoutStartSec=0
+ExecStart=/usr/sbin/regen-docker-config
+
+[Install]
+WantedBy=multi-user.target
