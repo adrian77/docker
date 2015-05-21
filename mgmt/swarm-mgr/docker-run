@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run -d --restart=always --name sm-2 --volumes-from=swarm-discovery -p 2381:2375 adrianszwej/swarm-addons:0.1

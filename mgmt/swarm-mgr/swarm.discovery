@@ -1,0 +1,4 @@
+#!/bin/bash
+
+[[ ! -e /var/run/dbus/system_bus_socket ]] && echo "Error! /var/run/dbus/system_bus_socket is not accessible." && exit 1
+avahi-publish -s "Swarm manager" _swarm-manager._tcp 2375

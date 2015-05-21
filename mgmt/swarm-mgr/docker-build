@@ -1,0 +1,7 @@
+#!/bin/bash
+# Support script for docker
+#
+
+. ../../bin/for-docker/common-routines
+
+docker build -t="adrianszwej/swarm-addons:0.1" . 

@@ -1,0 +1,4 @@
+# Start the publisher container of the swarm manager
+sm_cont=sm-2
+image=adrianszwej/swarm-publish:0.1
+docker run --rm -t -i --name swarm-publish --env SWARM_GROUP=COM_SUT1 --link $sm_cont:sm -v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw $image /bin/bash

@@ -1,0 +1,9 @@
+FROM ubuntu:14.04.2
+MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
+# Swarm manager publisher
+COPY swarm.publish /
+RUN apt-get -y install wget avahi-utils
+RUN wget https://get.docker.com/builds/Linux/x86_64/docker-1.6.0
+RUN mv docker-1.6.0 /usr/bin/docker
+RUN chmod u+x /usr/bin/docker
+CMD ["/swarm.publish"]

@@ -1,0 +1,7 @@
+#!/bin/bash
+# Support script for docker
+#
+
+. ../../bin/for-docker/common-routines
+
+docker build -f Dockerfile.publish -t="adrianszwej/swarm-publish:0.1" . 

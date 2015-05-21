@@ -1,0 +1,7 @@
+#!/bin/bash
+# Support script for docker
+#
+
+. ../../bin/for-docker/common-routines
+
+docker build -f Dockerfile.discovery -t="adrianszwej/swarm-discovery:0.1" . 
