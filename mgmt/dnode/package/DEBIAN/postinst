@@ -1,0 +1,4 @@
+# Adding the unit file
+dmidecode --string system-uuid > /etc/docker/uuid
+systemctl enable /lib/systemd/system/unique-docker.service
+systemctl start unique-docker.service

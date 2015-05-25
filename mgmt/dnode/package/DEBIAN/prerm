@@ -1,0 +1,2 @@
+systemctl stop unique-docker.service
+systemctl disable /lib/systemd/system/unique-docker.service

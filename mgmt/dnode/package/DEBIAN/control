@@ -1,6 +1,6 @@
 Package: dnode-agent
 Source: no-source 
-Version: 1.1
+Version: 1.2
 Architecture: all
 Maintainer: Adrian Szwej <adrian.szwej@gmail.com>
 Installed-Size: 1
