@@ -1,6 +1,6 @@
 Package: dnode-agent
 Source: no-source 
-Version: 1.0
+Version: 1.1
 Architecture: all
 Maintainer: Adrian Szwej <adrian.szwej@gmail.com>
 Installed-Size: 1
@@ -12,4 +12,4 @@ Provides:
 Section: utils
 Priority: optional
 Homepage: http://www.szwej.com/
-Description: Utils and configuration to convert a machine being a docker node. 
+Description: Utils and configuration to convert a docker machine into auto discovered docker swarm node. 

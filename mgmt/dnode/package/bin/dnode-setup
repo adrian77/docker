@@ -10,9 +10,7 @@ BROWSE_CMD="avahi-browse --resolve --terminate --parsable --domain local $SERVIC
 $BROWSE_CMD | grep -E "=.*;IPv4;" | awk -F ';' '{print $4}' | grep $1 > /dev/null && echo "Docker node $1 seem to be already present in the network" && exit 1
 
 # Reset the docker deamon ID
-rm /etc/docker/key.json
 hostname -b $1
-/etc/init.d/docker restart
 
 # To republish the new hostname
 /etc/init.d/avahi-daemon restart

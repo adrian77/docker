@@ -1,2 +1,4 @@
 Setup stuff to convert a node to docker node.
 - Package to setup a docker node
+
+After installation of this package nodes can be located using the dnode-list command.
