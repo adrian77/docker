@@ -3,7 +3,7 @@
 [[ -z $2 ]] && echo Specify number of payloads && exit 1
 
 # Default image to instansiate containers from
-image=adrianszwej/opensaf:latest-ubuntu-14
+image=adrianszwej/opensaf:4.6-debian-8.0
 cmd="/etc/init.d/opensafd start"
 NETPREFIX=1.1
 
@@ -16,6 +16,9 @@ SCs=$1
 PLs=$2
 # If TIPC address should be set outside the container
 tipc_manage=no
+
+# If TIPC should be using the macvlan intra interface
+tipc_intra=no
 
 [[ -z $OFFSET ]] && OFFSET=0
 [[ -z $STORAGE ]] && STORAGE=~/sharedfs
@@ -49,7 +52,7 @@ __create_container()
 
     docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs -v $SFS/container.env:/etc/container.env -v $SFS/setup-opensaf-node:/home/opensaf/setup-opensaf-node $image
    
-    if [ "$TIPC" = "yes" ]; then
+    if [ "$TIPC" = "yes" -a "${tipc_intra}" = "yes" ]; then
        PID=`docker inspect -f '{{.State.Pid}}' $1`
        __create_tipc_namespace $PID ${2/*-}
     fi
