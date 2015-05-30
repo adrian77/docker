@@ -4,4 +4,4 @@
 
 . ../../bin/for-docker/common-routines
 
-docker build -t="adrianszwej/opensaf:4.6-debian-7.6" . 
+docker build -t="adrianszwej/opensaf:4.6-debian-8.0" . 

@@ -1,4 +1,4 @@
-FROM debian:7.6
+FROM debian:8.0
 MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 # @Version: 1.1
 # The following docker file perform E2E development setup to OpenSAF installation 
@@ -26,7 +26,13 @@ WORKDIR /home/opensaf
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc-config /sbin/tipc-config
 
-RUN chmod u+x /home/opensaf/*
+# Add helper build scripts 
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/download-opensaf /home/opensaf/download-opensaf
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/configure-opensaf-basic /home/opensaf/configure-opensaf-basic
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/install-opensaf /home/opensaf/install-opensaf
+
+RUN chmod u+x /home/opensaf/* && \
+    chmod u+x /sbin/tipc-config
 
 # make sure the package repository is up to date
 RUN apt-get update
@@ -36,7 +42,7 @@ RUN apt-get install -y vim less && \
     apt-get clean
 
 # Packages needed for for runtime. Python is only used for generation of initial xml; but also for cluster resize.
-RUN apt-get install -y sudo net-tools sqlite3 libxml2 psmisc procps python && \
+RUN apt-get install -y sudo net-tools sqlite3 libxml2 psmisc procps python kmod && \
     apt-get clean  
 
 # Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
@@ -44,18 +50,17 @@ RUN apt-get install -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtoo
     apt-get clean && \
     echo "# Download and build OpenSAF" && \
     cd /home/opensaf && \
-    hg clone http://hg.code.sf.net/p/opensaf/staging opensaf-staging && \
-    cd opensaf-* && \
-    hg update default && \
-    ./bootstrap.sh && \
-    ./configure --enable-imm-pbe --disable-ais-plm --disable-ais-msg --disable-ais-lck --disable-ais-evt --disable-rpm-target && \
-    make install && \
-    ldconfig && \
+    ./download-opensaf && \
+    ./configure-opensaf-basic opensaf-4.6.x && \
+    ./install-opensaf && \
     rm -rf /home/opensaf/opensaf-* && \
     echo "# Remove development packages" && \
     apt-get remove -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtool pkg-config make python-dev libsqlite3-dev && \
     apt-get autoremove -y && \
     apt-get clean && \
+    rm -rf /home/opensaf/download-opensaf && \
+    rm -rf /home/opensaf/configure-opensaf-basic && \
+    rm -rf /home/opensaf/install-opensaf && \
     sed '/\. \/lib\/lsb\/init-functions/ a\\/home\/opensaf\/setup-opensaf-node' -i /etc/init.d/opensafd
 
 RUN groupadd opensaf && \
