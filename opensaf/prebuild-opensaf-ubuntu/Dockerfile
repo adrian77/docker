@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:15.04
 MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 # @Version: 1.2
 # The following docker file perform E2E development setup to OpenSAF installation 
@@ -42,7 +42,7 @@ RUN apt-get install -y vim && \
     apt-get clean
 
 # Packages needed for for runtime. Python is only used for generation of initial xml; but also for cluster resize.
-RUN apt-get install -y sudo sqlite3 libxml2 psmisc python && \
+RUN apt-get install -y sudo sqlite3 libxml2 psmisc python net-tools && \
     apt-get clean  
 
 # Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.6.x | opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
