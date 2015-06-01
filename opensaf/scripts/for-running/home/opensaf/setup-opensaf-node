@@ -1,6 +1,8 @@
 #!/bin/bash
 # Node configuration script for opensaf node
 #
+# @verison: 1.4
+#   added support for 4095 tipc nodes (Note: A special patch on opensaf code is required)
 # @version: 1.3
 #   added environment variable IFACE & NODEID & TYPE for hinting about the interface to use for internal communication. Prefix is enough.
 # @version: 1.2
@@ -33,6 +35,19 @@ mcast=224.0.0.6
 [[ -z $TIPC ]] && TIPC=no
 [[ -f /etc/container.env ]] && source /etc/container.env
 
+# Generate node id configuration for slot id and subslot id
+# This function ensures nodes up to 4095 can be configured
+function configure_node_id()
+{
+  local even=0
+  local nodenr=$1
+  slot_id=$((nodenr%256))
+  subslot_id=`echo $((15-$((nodenr/256))))`
+
+  echo "$slot_id" > /etc/opensaf/slot_id
+  echo "$subslot_id" > /etc/opensaf/subslot_id
+}
+
 # For some reason -disable-ais-plm does not work on fedora
 sed -e 's/^\/usr\/local\/lib\/opensaf\/clc-cli\/osaf-plmd\:PLMD/#\/usr\/local\/lib\/opensaf\/clc-cli\/osaf-plmd\:PLMD/' -i /etc/opensaf/nodeinit.conf.controller
 
@@ -51,7 +66,7 @@ fi
 
 # Host specific configuration
 [[ -z $nodeid ]] && nodeid=`hostname | cut -d "-" -f 2`
-echo $nodeid > /etc/opensaf/slot_id
+configure_node_id $nodeid
 [[ -z $type ]] && type=`hostname | cut -d "-" -f 1`
 if [ $type = "PL" ]; then
   echo "payload" > /etc/opensaf/node_type
