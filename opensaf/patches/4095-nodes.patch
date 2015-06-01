@@ -125,4 +125,3 @@ diff --git a/osaf/services/saf/smfsv/smfd/smfd_cb.h b/osaf/services/saf/smfsv/sm
         char *bundleCheckCmd;                       /* Bundle check cmd string      */
         char *nodeCheckCmd;                         /* Node check cmd string        */
 
-~                                                                                              
