@@ -5,18 +5,18 @@ diff --git a/osaf/libs/common/cpsv/include/cpd_cb.h b/osaf/libs/common/cpsv/incl
 --- a/osaf/libs/common/cpsv/include/cpd_cb.h
 +++ b/osaf/libs/common/cpsv/include/cpd_cb.h
 @@ -180,7 +180,6 @@ typedef struct cpd_cb_tag {
-        bool is_quiesced_set;
-        MDS_DEST loc_cpnd_dest;
-        MDS_DEST rem_cpnd_dest;
--       /*MDS_DEST             cpnd_dests[NCS_MAX_SLOTS]; */
-
-        NCS_PATRICIA_TREE cpnd_tree;
-
+ 	bool is_quiesced_set;
+ 	MDS_DEST loc_cpnd_dest;
+ 	MDS_DEST rem_cpnd_dest;
+-	/*MDS_DEST             cpnd_dests[NCS_MAX_SLOTS]; */
+ 
+ 	NCS_PATRICIA_TREE cpnd_tree;
+ 
 diff --git a/osaf/libs/core/include/ncsgl_defs.h b/osaf/libs/core/include/ncsgl_defs.h
 --- a/osaf/libs/core/include/ncsgl_defs.h
 +++ b/osaf/libs/core/include/ncsgl_defs.h
 @@ -73,14 +73,12 @@ extern "C" {
-
+ 
  /*************************************************
   * Maximum Slots (Including sub slots) supported
 - * 16 slots x 8 subslots
@@ -24,19 +24,19 @@ diff --git a/osaf/libs/core/include/ncsgl_defs.h b/osaf/libs/core/include/ncsgl_
   *************************************************/
 -#define NCS_SLOT_MAX 16
 +#define NCS_SLOT_MAX 256
-
+ 
  #define NCS_SUB_SLOT_MAX 16
-
+ 
 -#define NCS_MAX_SLOTS ((NCS_SLOT_MAX *  NCS_SUB_SLOT_MAX) + NCS_SLOT_MAX)
 -
-        typedef uint64_t MDS_DEST;
-        typedef uint32_t NCS_NODE_ID;
-        typedef uint8_t NCS_CHASSIS_ID;
+ 	typedef uint64_t MDS_DEST;
+ 	typedef uint32_t NCS_NODE_ID;
+ 	typedef uint8_t NCS_CHASSIS_ID;
 diff --git a/osaf/libs/core/mds/include/mds_dt.h b/osaf/libs/core/mds/include/mds_dt.h
 --- a/osaf/libs/core/mds/include/mds_dt.h
 +++ b/osaf/libs/core/mds/include/mds_dt.h
 @@ -247,13 +247,20 @@ bool mdtm_mailbox_mbx_cleanup(NCSCONTEXT
-
+ 
  #if (MDS_USE_SUBSLOT_ID == 0)
  #define MDS_TIPC_NODE_ID_MIN     0x01001001
 -#define MDS_TIPC_NODE_ID_MAX     0x010010ff
@@ -54,8 +54,8 @@ diff --git a/osaf/libs/core/mds/include/mds_dt.h b/osaf/libs/core/mds/include/md
 +        return MDS_TIPC_COMMON_ID | ((node & 0xff00) >> 8) | ((0xf - (node & 0xf)) << 8);
 +}
 +static inline uint32_t m_MDS_CHECK_TIPC_NODE_ID_RANGE(NODE_ID node) {
-+       return node < MDS_TIPC_NODE_ID_MIN || node > MDS_TIPC_NODE_ID_MAX ?
-+               NCSCC_RC_FAILURE : NCSCC_RC_SUCCESS;
++	return node < MDS_TIPC_NODE_ID_MIN || node > MDS_TIPC_NODE_ID_MAX ?
++		NCSCC_RC_FAILURE : NCSCC_RC_SUCCESS;
 +}
 +static inline uint32_t m_MDS_CHECK_NCS_NODE_ID_RANGE(NODE_ID node) {
 +    return m_MDS_CHECK_TIPC_NODE_ID_RANGE(m_MDS_GET_TIPC_NODE_ID_FROM_NCS_NODE_ID(node));
@@ -68,11 +68,11 @@ diff --git a/osaf/libs/core/mds/include/mds_dt.h b/osaf/libs/core/mds/include/md
  #define m_MDS_GET_TIPC_NODE_ID_FROM_NCS_NODE_ID(node) \
          (NODE_ID)( MDS_TIPC_COMMON_ID | (((node)&0xff00)>>4) | ((node)&0xf) )
 -#endif
-
+ 
  #define m_MDS_CHECK_TIPC_NODE_ID_RANGE(node) (((((node)<MDS_TIPC_NODE_ID_MIN)||((node)>MDS_TIPC_NODE_ID_MAX))?NCSCC_RC_FAILURE:NCSCC_RC_SUCCESS))
  #define m_MDS_CHECK_NCS_NODE_ID_RANGE(node) (((((node)<MDS_NCS_NODE_ID_MIN)||((node)>MDS_NCS_NODE_ID_MAX))?NCSCC_RC_FAILURE:NCSCC_RC_SUCCESS))
 +#endif
-
+ 
  /* ******************************************** */
  /* ******************************************** */
 diff --git a/osaf/services/infrastructure/nid/scripts/configure_tipc.in b/osaf/services/infrastructure/nid/scripts/configure_tipc.in
@@ -84,7 +84,7 @@ diff --git a/osaf/services/infrastructure/nid/scripts/configure_tipc.in b/osaf/s
  SLOT_ID=`cat "$SLOT_ID_FILE"`
 -if [ "$SLOT_ID" -gt "255" ] || [ "$SLOT_ID" -lt "1" ]  
 +if [ "$SLOT_ID" -gt "255" ] || [ "$SLOT_ID" -lt "0" ]
-     then
+     then 
 -      echo "SLOT ID Should be in the range of 1 to 255"
 +      echo "SLOT ID Should be in the range of 0 to 255"
        echo "Quitting......"
@@ -99,29 +99,29 @@ diff --git a/osaf/services/infrastructure/nid/scripts/configure_tipc.in b/osaf/s
 +    echo "Quitting......"
 +    exit 1
 +fi
-
+ 
  if [ "$#" -lt "1" ] ||  [ "$#" -gt "4" ]
     then
 @@ -109,7 +114,9 @@ if [ "$USE_SUBSLOT_ID" = "YES" ]; then
      TIPC_NODEID=$(($SLOT_ID << $SHIFT4))
      TIPC_NODEID=$(($TIPC_NODEID + $SUBSLOT_ID))
- else
+ else    
 -    TIPC_NODEID=$SLOT_ID    
 +    TIPC_NODEID=$((15 - SUBSLOT_ID))
 +    TIPC_NODEID=$((TIPC_NODEID << 8))
 +    TIPC_NODEID=$((TIPC_NODEID + SLOT_ID))
  fi
-
+ 
  function tipc_configure ()
 diff --git a/osaf/services/saf/smfsv/smfd/smfd_cb.h b/osaf/services/saf/smfsv/smfd/smfd_cb.h
 --- a/osaf/services/saf/smfsv/smfd/smfd_cb.h
 +++ b/osaf/services/saf/smfsv/smfd/smfd_cb.h
 @@ -41,7 +41,6 @@ typedef struct smfd_cb {
-        SaImmOiHandleT campaignOiHandle;            /* IMM Campaign OI handle                           */
-        SaSelectionObjectT campaignSelectionObject; /* Selection Object to wait for campaign IMM events */
-        SaAmfHAStateT ha_state;                     /* present AMF HA state of the component            */
--       MDS_DEST smfnd_dests[NCS_MAX_SLOTS];        /* destinations for all smfnd   */
-        char *backupCreateCmd;                      /* Backup create cmd string     */
-        char *bundleCheckCmd;                       /* Bundle check cmd string      */
-        char *nodeCheckCmd;                         /* Node check cmd string        */
+ 	SaImmOiHandleT campaignOiHandle;            /* IMM Campaign OI handle                           */
+ 	SaSelectionObjectT campaignSelectionObject; /* Selection Object to wait for campaign IMM events */
+ 	SaAmfHAStateT ha_state;	                    /* present AMF HA state of the component            */
+-	MDS_DEST smfnd_dests[NCS_MAX_SLOTS];        /* destinations for all smfnd   */
+ 	char *backupCreateCmd;	                    /* Backup create cmd string     */
+ 	char *bundleCheckCmd;	                    /* Bundle check cmd string      */
+ 	char *nodeCheckCmd;	                    /* Node check cmd string        */
 
