@@ -1,0 +1,11 @@
+#!/bin/bash
+# Support script for docker
+#
+VERSION=4.7.patched
+DVERSION=ubuntu-15
+[[ ! -z $1 ]] && VERSION=$1
+echo Building with version $VERSION
+
+. ../../bin/for-docker/common-routines
+
+docker build -f Dockerfile.patched -t="adrianszwej/opensaf:$VERSION-$DVERSION" . 
