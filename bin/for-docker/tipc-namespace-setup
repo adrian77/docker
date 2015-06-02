@@ -4,7 +4,7 @@
 LANIF=eth0
 
 LAN=intra
-NETID=4711
+NETID=1234
 NS=$1
 TIPC_NODE=$2
 MANAGE=$3
@@ -14,9 +14,9 @@ MANAGE=$3
 # arg3 : tipc node id on format x.x.x
 function __on_ns_exec()
 {
+    ip netns exec $1 tipc-config -netid=$NETID
     ip netns exec $1 tipc-config -a=$3 
     ip netns exec $1 tipc-config -be=eth:$2 
-    ip netns exec $1 tipc-config -netid=$NETID
 }
 
 # Creates a namespace and assign the tipc address

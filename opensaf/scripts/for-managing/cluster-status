@@ -13,18 +13,21 @@ __get_containers()
 
 __status_containers()
 {
-   for name in $@; do
+   containers=$(__get_containers)
+   [[ $? -ne 0 ]] && echo "Cluster $clustername is not defined" && exit 1
+   for name in $containers; do
       pid=`docker inspect -f '{{.State.Pid}}' $name`
       if [ "$pid" -ne 0 ]; then
-        address=`ip netns exec $pid tipc-config -a | grep -o "<.*>"`
+        #address=`ip netns exec $pid tipc-config -a | grep -o "<.*>"`
 
-        up=`ip netns exec $pid tipc-config -l | grep ": up" | wc -l`
-        down=`ip netns exec $pid tipc-config -l | grep ": down" | wc -l`
-        echo "$name $address LinksUp: $up. LinksDown: $down"
+        #up=`ip netns exec $pid tipc-config -l | grep ": up" | wc -l`
+        #down=`ip netns exec $pid tipc-config -l | grep ": down" | wc -l`
+        #echo "$name $address LinksUp: $up. LinksDown: $down"
+        echo "$name: running"
       else
-        echo "$name is not running"
+        echo "$name: not running"
       fi
    done
 }
 
-__status_containers $(__get_containers)
+__status_containers 
