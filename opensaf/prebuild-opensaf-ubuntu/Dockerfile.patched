@@ -54,10 +54,10 @@ RUN apt-get install -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtoo
     echo "# Download and build OpenSAF" && \
     cd /home/opensaf && \
     ./download-opensaf && \
-    ./configure-opensaf-basic && \
     cd opensaf-staging  && \
     cat ../patches/* | patch -d . -p1 && \
     cd .. && \
+    ./configure-opensaf-basic && \
     ./install-opensaf && \ 
     rm -rf /home/opensaf/opensaf-* && \
     echo "# Remove development packages" && \
