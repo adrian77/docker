@@ -1,0 +1,34 @@
+FROM adrianszwej/opensaf:build_1.0-ubuntu_15
+MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
+
+RUN mkdir -p /home/opensaf
+WORKDIR /home/opensaf
+
+# Add helper build scripts 
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/download-opensaf /home/opensaf/download-opensaf
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/configure-opensaf-basic /home/opensaf/configure-opensaf-basic
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/install-opensaf /home/opensaf/install-opensaf
+
+# Add binaries and scripts needing for runtime
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc-config /sbin/tipc-config
+
+RUN chmod u+x /home/opensaf/* && \
+    chmod u+x /sbin/tipc-config
+
+# Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.6.x | opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
+RUN echo "# Download and build OpenSAF" && \
+    cd /home/opensaf && \
+    ./download-opensaf && \
+    ./configure-opensaf-basic && \
+    ./install-opensaf && \
+    rm -rf /home/opensaf/opensaf-* && \
+    echo "# Remove development packages" && \
+    rm -rf /home/opensaf/download-opensaf && \
+    rm -rf /home/opensaf/configure-opensaf-basic && \
+    rm -rf /home/opensaf/install-opensaf && \
+    sed '/\. \/lib\/lsb\/init-functions/ a\\/home\/opensaf\/setup-opensaf-node' -i /etc/init.d/opensafd
+
+ENV container docker
+
+CMD    ["/bin/bash"]

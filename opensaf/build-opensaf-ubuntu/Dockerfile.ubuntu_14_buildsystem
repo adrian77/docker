@@ -1,0 +1,22 @@
+FROM ubuntu:14.04
+MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
+# Build image for support building opensaf
+
+# make sure the package repository is up to date
+RUN apt-get update
+
+# Packages for useability
+RUN apt-get install -y vim && \
+    apt-get clean
+
+# Packages needed for for runtime. Python is only used for generation of initial xml; but also for cluster resize.
+RUN apt-get install -y sudo sqlite3 libxml2 psmisc python net-tools kmod && \
+    apt-get clean  
+
+# Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.6.x | opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
+RUN apt-get install -y mercurial gcc g++ libxml2-dev automake m4 autoconf libtool pkg-config make python-dev libsqlite3-dev && \
+    apt-get clean 
+
+ENV container docker
+
+CMD    ["/bin/bash"]
