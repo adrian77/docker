@@ -8,15 +8,22 @@ NETID=1234
 NS=$1
 TIPC_NODE=$2
 MANAGE=$3
+TOLERANCE=10000
+WINDOW=150
 
 # arg1 : namespace
 # arg2 : laninterface
 # arg3 : tipc node id on format x.x.x
 function __on_ns_exec()
 {
-    ip netns exec $1 tipc-config -netid=$NETID
-    ip netns exec $1 tipc-config -a=$3 
-    ip netns exec $1 tipc-config -be=eth:$2 
+    ip netns exec $1 tipc node set netid $NETID
+    ip netns exec $1 tipc node set address $3
+    ip netns exec $1 tipc bearer enable media eth device $2
+    ip netns exec $1 tipc bearer set window $WINDOW media eth device $2 
+    ip netns exec $1 tipc bearer set tolerance $TOLERANCE media eth device $2 
+    #ip netns exec $1 tipc-config -netid=$NETID
+    #ip netns exec $1 tipc-config -a=$3 
+    #ip netns exec $1 tipc-config -be=eth:$2 
 }
 
 # Creates a namespace and assign the tipc address
