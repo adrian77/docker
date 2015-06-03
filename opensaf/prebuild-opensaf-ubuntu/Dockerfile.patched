@@ -34,8 +34,12 @@ ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/patches/409
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc-config /sbin/tipc-config
 
+# More modern version of the tipc configuration based on netlink api. This is pushed for iproute2 package.
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc /sbin/tipc
+
 RUN chmod u+x /home/opensaf/* && \
-    chmod u+x /sbin/tipc-config
+    chmod u+x /sbin/tipc-config && \
+    chmod u+x /sbin/tipc
 
 # make sure the package repository is up to date
 RUN apt-get update
@@ -45,7 +49,7 @@ RUN apt-get install -y vim && \
     apt-get clean
 
 # Packages needed for for runtime. Python is only used for generation of initial xml; but also for cluster resize.
-RUN apt-get install -y sudo sqlite3 libxml2 psmisc python net-tools kmod && \
+RUN apt-get install -y sudo sqlite3 libxml2 psmisc python net-tools kmod libmnl0 && \
     apt-get clean  
 
 # Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.6.x | opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
