@@ -1,5 +1,5 @@
 # HG changeset patch
-# Parent 1d393f3d0f469d2d03ffa2b7e7782612a83aedbc
+# Parent 7902a1cd526a6a03e9e914e4cfda6f70eb2a27f7
 
 diff --git a/osaf/libs/common/cpsv/include/cpd_cb.h b/osaf/libs/common/cpsv/include/cpd_cb.h
 --- a/osaf/libs/common/cpsv/include/cpd_cb.h
@@ -12,10 +12,41 @@ diff --git a/osaf/libs/common/cpsv/include/cpd_cb.h b/osaf/libs/common/cpsv/incl
  
  	NCS_PATRICIA_TREE cpnd_tree;
  
+diff --git a/osaf/libs/common/mqsv/include/mqsv_common.h b/osaf/libs/common/mqsv/include/mqsv_common.h
+--- a/osaf/libs/common/mqsv/include/mqsv_common.h
++++ b/osaf/libs/common/mqsv/include/mqsv_common.h
+@@ -86,7 +86,7 @@
+ 
+ uint32_t machineEndianness(void);
+ uint32_t mqsv_listenerq_msg_send(SaMsgQueueHandleT listenerhandle);
+-NCS_PHY_SLOT_ID mqsv_get_phy_slot_id(MDS_DEST dest);
++uint32_t mqsv_get_phy_slot_id(MDS_DEST dest);
+ typedef unsigned int MSG_FRMT_VER;
+ 
+ #define m_MQSV_CONVERT_SATIME_TEN_MILLI_SEC(t)      (t)/(10000000)	/* 10^7 */
+diff --git a/osaf/libs/common/mqsv/mqsv_common.c b/osaf/libs/common/mqsv/mqsv_common.c
+--- a/osaf/libs/common/mqsv/mqsv_common.c
++++ b/osaf/libs/common/mqsv/mqsv_common.c
+@@ -117,12 +117,13 @@ uint32_t mqsv_listenerq_msg_send(SaMsgQu
+ 
+ *************************************************************************************/
+ 
+-NCS_PHY_SLOT_ID mqsv_get_phy_slot_id(MDS_DEST dest)
++uint32_t mqsv_get_phy_slot_id(MDS_DEST dest)
+ {
+ 	NCS_PHY_SLOT_ID phy_slot;
+ 	NCS_SUB_SLOT_ID sub_slot;
+ 
+ 	m_NCS_GET_PHYINFO_FROM_NODE_ID(m_NCS_NODE_ID_FROM_MDS_DEST(dest), NULL, &phy_slot, &sub_slot);
+ 
+-	return ((sub_slot * NCS_SUB_SLOT_MAX) + phy_slot);
++	osafassert(sub_slot < NCS_SUB_SLOT_MAX);
++	return ((uint32_t) sub_slot) + ((uint32_t) phy_slot) * NCS_SUB_SLOT_MAX;
+ }
 diff --git a/osaf/libs/core/include/ncsgl_defs.h b/osaf/libs/core/include/ncsgl_defs.h
 --- a/osaf/libs/core/include/ncsgl_defs.h
 +++ b/osaf/libs/core/include/ncsgl_defs.h
-@@ -73,14 +73,12 @@ extern "C" {
+@@ -73,13 +73,13 @@ extern "C" {
  
  /*************************************************
   * Maximum Slots (Including sub slots) supported
@@ -28,10 +59,10 @@ diff --git a/osaf/libs/core/include/ncsgl_defs.h b/osaf/libs/core/include/ncsgl_
  #define NCS_SUB_SLOT_MAX 16
  
 -#define NCS_MAX_SLOTS ((NCS_SLOT_MAX *  NCS_SUB_SLOT_MAX) + NCS_SLOT_MAX)
--
++#define NCS_MAX_SLOTS (NCS_SLOT_MAX *  NCS_SUB_SLOT_MAX)
+ 
  	typedef uint64_t MDS_DEST;
  	typedef uint32_t NCS_NODE_ID;
- 	typedef uint8_t NCS_CHASSIS_ID;
 diff --git a/osaf/libs/core/mds/include/mds_dt.h b/osaf/libs/core/mds/include/mds_dt.h
 --- a/osaf/libs/core/mds/include/mds_dt.h
 +++ b/osaf/libs/core/mds/include/mds_dt.h
@@ -113,6 +144,89 @@ diff --git a/osaf/services/infrastructure/nid/scripts/configure_tipc.in b/osaf/s
  fi
  
  function tipc_configure ()
+diff --git a/osaf/services/saf/cpsv/cpd/cpd_db.c b/osaf/services/saf/cpsv/cpd/cpd_db.c
+--- a/osaf/services/saf/cpsv/cpd/cpd_db.c
++++ b/osaf/services/saf/cpsv/cpd/cpd_db.c
+@@ -1213,7 +1213,8 @@ uint32_t cpd_get_slot_sub_id_from_mds_de
+ 
+ 	m_NCS_GET_PHYINFO_FROM_NODE_ID(m_NCS_NODE_ID_FROM_MDS_DEST(dest), NULL, &phy_slot, &sub_slot);
+ 
+-	return ((sub_slot * NCS_SUB_SLOT_MAX) + (phy_slot));
++	osafassert(sub_slot < NCS_SUB_SLOT_MAX);
++	return ((uint32_t) sub_slot) + ((uint32_t) phy_slot) * NCS_SUB_SLOT_MAX;
+ }
+ 
+ /********************************************************************************
+@@ -1232,8 +1233,8 @@ uint32_t cpd_get_slot_sub_slot_id_from_n
+ 
+ 	m_NCS_GET_PHYINFO_FROM_NODE_ID(i_node_id, NULL, &phy_slot, &sub_slot);
+ 
+-	return ((sub_slot * NCS_SUB_SLOT_MAX) + (phy_slot));
+-
++	osafassert(sub_slot < NCS_SUB_SLOT_MAX);
++	return ((uint32_t) sub_slot) + ((uint32_t) phy_slot) * NCS_SUB_SLOT_MAX;
+ }
+ 
+ /*******************************************************************************************
+diff --git a/osaf/services/saf/cpsv/cpnd/cpnd_db.c b/osaf/services/saf/cpsv/cpnd/cpnd_db.c
+--- a/osaf/services/saf/cpsv/cpnd/cpnd_db.c
++++ b/osaf/services/saf/cpsv/cpnd/cpnd_db.c
+@@ -733,7 +733,8 @@ uint32_t cpnd_get_slot_sub_slot_id_from_
+ 
+ 	m_NCS_GET_PHYINFO_FROM_NODE_ID(m_NCS_NODE_ID_FROM_MDS_DEST(dest), NULL, &phy_slot, &sub_slot);
+ 
+-	return ((sub_slot * NCS_SUB_SLOT_MAX) + (phy_slot));
++	osafassert(sub_slot < NCS_SUB_SLOT_MAX);
++	return ((uint32_t) sub_slot) + ((uint32_t) phy_slot) * NCS_SUB_SLOT_MAX;
+ }
+ 
+ /***********************************************************************************
+@@ -749,8 +750,8 @@ uint32_t cpnd_get_slot_sub_slot_id_from_
+ 
+ 	m_NCS_GET_PHYINFO_FROM_NODE_ID(i_node_id, NULL, &phy_slot, &sub_slot);
+ 
+-	return ((sub_slot * NCS_SUB_SLOT_MAX) + (phy_slot));
+-
++	osafassert(sub_slot < NCS_SUB_SLOT_MAX);
++	return ((uint32_t) sub_slot) + ((uint32_t) phy_slot) * NCS_SUB_SLOT_MAX;
+ }
+ 
+ /******************************************************************************************
+diff --git a/osaf/services/saf/immsv/immd/immd_db.c b/osaf/services/saf/immsv/immd/immd_db.c
+--- a/osaf/services/saf/immsv/immd/immd_db.c
++++ b/osaf/services/saf/immsv/immd/immd_db.c
+@@ -296,7 +296,8 @@ uint32_t immd_get_slot_and_subslot_id_fr
+ 
+ 	m_NCS_GET_PHYINFO_FROM_NODE_ID(m_NCS_NODE_ID_FROM_MDS_DEST(dest), NULL, &phy_slot, &sub_slot);
+ 
+-	return ((sub_slot * NCS_SUB_SLOT_MAX) + (phy_slot));
++	osafassert(sub_slot < NCS_SUB_SLOT_MAX);
++	return ((uint32_t) sub_slot) + ((uint32_t) phy_slot) * NCS_SUB_SLOT_MAX;
+ }
+ 
+ /*****************************************************************************
+@@ -313,7 +314,8 @@ uint32_t immd_get_slot_and_subslot_id_fr
+ 
+ 	m_NCS_GET_PHYINFO_FROM_NODE_ID(node_id, NULL, &phy_slot, &sub_slot);
+ 
+-	return ((sub_slot * NCS_SUB_SLOT_MAX) + (phy_slot));
++	osafassert(sub_slot < NCS_SUB_SLOT_MAX);
++	return ((uint32_t) sub_slot) + ((uint32_t) phy_slot) * NCS_SUB_SLOT_MAX;
+ }
+ 
+ void immd_db_save_fevs(IMMD_CB *cb, IMMSV_FEVS *fevs_msg)
+diff --git a/osaf/services/saf/mqsv/mqd/mqd_mds.c b/osaf/services/saf/mqsv/mqd/mqd_mds.c
+--- a/osaf/services/saf/mqsv/mqd/mqd_mds.c
++++ b/osaf/services/saf/mqsv/mqd/mqd_mds.c
+@@ -567,7 +567,7 @@ static void mqd_mds_svc_evt(MQD_CB *pMqd
+ 	case NCSMDS_UP:
+ 		{
+ 			if (svc->i_svc_id == NCSMDS_SVC_ID_MQND) {
+-				uint16_t to_dest_slotid, o_msg_fmt_ver;
++				uint32_t to_dest_slotid, o_msg_fmt_ver;
+ 				to_dest_slotid = mqsv_get_phy_slot_id(svc->i_dest);
+ 
+ 				o_msg_fmt_ver = m_NCS_ENC_MSG_FMT_GET(svc->i_rem_svc_pvt_ver,
 diff --git a/osaf/services/saf/smfsv/smfd/smfd_cb.h b/osaf/services/saf/smfsv/smfd/smfd_cb.h
 --- a/osaf/services/saf/smfsv/smfd/smfd_cb.h
 +++ b/osaf/services/saf/smfsv/smfd/smfd_cb.h
@@ -124,4 +238,16 @@ diff --git a/osaf/services/saf/smfsv/smfd/smfd_cb.h b/osaf/services/saf/smfsv/sm
  	char *backupCreateCmd;	                    /* Backup create cmd string     */
  	char *bundleCheckCmd;	                    /* Bundle check cmd string      */
  	char *nodeCheckCmd;	                    /* Node check cmd string        */
+diff --git a/osaf/tools/safimm/immxml/immxml-nodegen b/osaf/tools/safimm/immxml/immxml-nodegen
+--- a/osaf/tools/safimm/immxml/immxml-nodegen
++++ b/osaf/tools/safimm/immxml/immxml-nodegen
+@@ -22,7 +22,7 @@ PL_TEMPLATE_FILE=input/imm_PL_template.x
+ PL_PATTERN=PL_2_3
+ CUR_SC_COUNT=0
+ CUR_PL_COUNT=0
+-UNDEF_COUNT=999
++UNDEF_COUNT=4093
+ SC_COUNT=$UNDEF_COUNT
+ PL_COUNT=$UNDEF_COUNT
+ RESULT_DIR=./nodegen_result
 
