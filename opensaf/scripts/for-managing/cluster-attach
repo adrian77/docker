@@ -1,0 +1,6 @@
+# Attaching to node
+nodenr=1
+[[ ! -z $1 ]] && nodenr=$1
+type=SC
+[[ $nodenr -gt 2 ]] && type=PL
+docker attach default-${type}-$nodenr
