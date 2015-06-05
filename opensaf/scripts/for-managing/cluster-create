@@ -35,7 +35,7 @@ __check_tipc_module()
    lsmod | grep tipc > /dev/null || (echo "TIPC module is not loaded" && exit 1)
 }
 
-[[ -z $TIPC ]] && TIPC=yes && __check_tipc_module
+[[ -z $TIPC ]] && TIPC=yes && __check_tipc_module || exit 1
 C_OPTS="--env TIPC=$TIPC"
 
 __create_tipc_namespace()
