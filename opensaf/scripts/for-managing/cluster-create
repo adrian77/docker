@@ -4,26 +4,27 @@
 
 # Default image to instansiate containers from
 #image=adrianszwej/opensaf:4.6-debian-8.0
-image=adrianszwej/opensaf:4.7.patched-ubuntu-15
-cmd="/etc/init.d/opensafd start"
+IMAGE=adrianszwej/opensaf:4.7.patched-ubuntu-15
+CMD="/etc/init.d/opensafd start"
 NETPREFIX=1.1
 
-[[ ! -z $3 ]] && image=$3 
-clustername=default
+[[ ! -z $3 ]] && IMAGE=$3 
+CLUSTERNAME=default
 
-[[ ! -z $4 ]] && clustername=$4 
+[[ ! -z $4 ]] && CLUSTERNAME=$4 
 
 SCs=$1
 PLs=$2
 # If TIPC address should be set outside the container
-tipc_manage=yes
+TIPC_MANAGE=yes
 
 # If TIPC should be using the macvlan intra interface
-tipc_intra=yes
+TIPC_INTRA=yes
 
 [[ -z $OFFSET ]] && OFFSET=0
+[[ -z $SC_OFFSET ]] && SC_OFFSET=0
 [[ -z $STORAGE ]] && STORAGE=~/sharedfs
-SFS=$STORAGE/$clustername
+SFS=$STORAGE/$CLUSTERNAME
 mkdir -p $SFS > /dev/null
 
 # To be removed for final version
@@ -43,16 +44,16 @@ __create_tipc_namespace()
    local pid=$1
    local nodeid=${NETPREFIX}.$2
    ln -s /proc/$pid/ns/net /var/run/netns/$pid
-   ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid $tipc_manage
+   ../../../bin/for-docker/tipc-namespace-setup $pid $nodeid $TIPC_MANAGE
 }
 
 __create_container()
 {
     echo "Creating container $name"
 
-    docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs -v $SFS/container.env:/etc/container.env $image /bin/bash
+    docker run --privileged -t -d -i --name $1 -h $2 $C_OPTS -v $SFS:/etc/opensaf/sharedfs -v $SFS/container.env:/etc/container.env $IMAGE /bin/bash
    
-    if [ "$TIPC" = "yes" -a "${tipc_intra}" = "yes" ]; then
+    if [ "$TIPC" = "yes" -a "${TIPC_INTRA}" = "yes" ]; then
        PID=`docker inspect -f '{{.State.Pid}}' $1`
        __create_tipc_namespace $PID ${2/*-}
     fi
@@ -60,15 +61,15 @@ __create_container()
 
 __create_scs()
 {
-	i=0
-	while [ $i -lt $SCs ]; do
+	i=$SC_OFFSET
+	while [ $i -lt $(($SCs + SC_OFFSET)) ]; do
 	   i=$(($i + 1))
 	   node=SC-$i 
-	   name=$clustername-SC-$i
+	   name=$CLUSTERNAME-SC-$i
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then 
 	     __create_container $name $node
-             docker exec $name $cmd
+             docker exec $name $CMD
 	   fi
 	done
 }
@@ -79,11 +80,11 @@ __create_pls()
 	while [ $i -lt $((PLs + OFFSET + 2)) ]; do
 	   i=$(($i + 1))
 	   node=PL-$i             
-	   name=$clustername-PL-$i
+	   name=$CLUSTERNAME-PL-$i
 	   docker inspect $name > /dev/null 2>&1
 	   if [ $? -ne 0 ]; then
 	     __create_container $name $node
-             docker exec $name $cmd
+             docker exec $name $CMD
 	   fi
 	done
 }
