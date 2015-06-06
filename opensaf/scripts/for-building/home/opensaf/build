@@ -2,5 +2,5 @@
 # Build script to build opensaf release
 ./download-opensaf
 ./configure-opensaf-basic $@
-opensaf-* 
+cd opensaf-* 
 make rpm
