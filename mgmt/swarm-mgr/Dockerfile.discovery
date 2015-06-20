@@ -1,6 +1,9 @@
-FROM ubuntu:14.04.2
+FROM ubuntu:15.04
 MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
+# The discovery detect new nodes using avahi service and rewrites the configuration to /etc/swarm/nodes.conf
+# Since the swarm backend based on file does not automatically reload the file, the swarm manager container will be reloaded
 COPY swarm.discovery /
+COPY swarm-manager.restart /
 RUN apt-get -y install wget avahi-utils
 RUN wget https://get.docker.com/builds/Linux/x86_64/docker-1.6.0
 RUN mv docker-1.6.0 /usr/bin/docker
@@ -9,5 +12,3 @@ RUN mkdir -p /etc/swarm
 ADD nodes.conf /etc/swarm/
 VOLUME /etc/swarm
 CMD ["/swarm.discovery"]
-
-#ENV GROUP=COM_SUT1

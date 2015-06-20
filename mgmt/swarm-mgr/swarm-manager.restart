@@ -1,0 +1,7 @@
+#!/bin/bash
+
+[[ ! -e /var/run/docker.sock ]] && echo "Error! /var/run/docker.sock is not accessible." && exit 1
+# resolve the name of the swarm manager
+
+# restart the swarm manager container
+docker restart sm 

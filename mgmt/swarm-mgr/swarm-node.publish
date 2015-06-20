@@ -1,0 +1,5 @@
+#!/bin/bash
+# Publish the swarm node
+
+[[ ! -e /var/run/dbus/system_bus_socket ]] && echo "Error! /var/run/dbus/system_bus_socket is not accessible." && exit 1
+avahi-publish -s "Swarm node" _swarm-node 2376

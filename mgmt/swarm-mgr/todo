@@ -1,0 +1,39 @@
+VM Level
+---
+0) Publish docker node
+
+Start the manager on each node:
+1) 
+docker run -d --restart=always --name sm -v /home/docker-admin/swarm-cluster/cluster:/etc/nodes.conf:rw -p 2380:2375 swarm manage --strategy=random file:///etc/nodes.conf
+2)
+publish the manager to avahi
+
+3)
+docker run auto-swarm list
+DOCKER_HOST=`docker run auto-swarm select <ManagerName>`
+docker run auto-swarm console <ManagerName>
+
+bad , to go at a side: docker run --rm swarm list <clusterID>`
+
+
+
+IDEA FULL AUTO
+ROLLING OUT COMPUTE NODES
+--------------------
+docker-node-publisher auto-started (container or services/.xml)
+ -- publish the node for a specific target
+
+CHECK IN NODES FOR A TENANT
+ssh n@user-n
+docker-node-hostname-set <hostname>
+tenant-node-check-in <tenantName>
+  --> starts auto-swarm
+
+node-manager auto-started
+ -- discover nodes, builds a file and restart the swarm manager
+    the restart is done by connecting to the local docker agent (or perhaps all swarm managers should be restarted)
+    publissh by:
+     docker port sm
+docker run --name sm-publisher-2 -t --link sm:sm --volumes-from=sm -i ubuntu:14.04 /bin/bash
+
+swarm-manager (shared volumed with the node-manager, or via fixed set of ips)
