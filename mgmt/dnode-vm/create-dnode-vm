@@ -1,0 +1,28 @@
+#!/bin/bash
+domfile=docker-vm.xml
+name=`cat $domfile | grep -Po '(?<=<name>).*(?<=<\/name>)' | cut -d "<" -f1`
+
+function _is_vm_defined()
+{
+   virsh list --name --all | grep "^$1$" > /dev/null
+}
+
+function _create_vm()
+{
+   cp $domfile /tmp/$domfile
+   sed s/"<name>.*<\/name>"/"<name>$name<\/name>"/g -i /tmp/$domfile
+   virsh define /tmp/$domfile 
+   virsh start $name
+}
+
+function _generate_name()
+{
+  newindex=$((${1/*-} + 1))
+  name=${1/-*}-$newindex
+  _is_vm_defined $name
+  [[ $? -eq  0 ]] && _generate_name $name
+}
+
+_is_vm_defined $name
+[[ $? -eq  0 ]] && _generate_name $name
+_create_vm

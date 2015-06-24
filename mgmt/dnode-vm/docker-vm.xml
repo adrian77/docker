@@ -1,0 +1,92 @@
+<domain type='kvm'>
+  <name>dockervm-1</name>
+  <memory unit='KiB'>4120576</memory>
+  <currentMemory unit='KiB'>4120576</currentMemory>
+  <vcpu placement='static'>4</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-trusty'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+  </features>
+  <cpu mode='custom' match='exact'>
+    <model fallback='allow'>Haswell</model>
+    <vendor>Intel</vendor>
+    <feature policy='require' name='tm2'/>
+    <feature policy='require' name='est'/>
+    <feature policy='require' name='vmx'/>
+    <feature policy='require' name='osxsave'/>
+    <feature policy='require' name='smx'/>
+    <feature policy='require' name='ss'/>
+    <feature policy='require' name='ds'/>
+    <feature policy='require' name='vme'/>
+    <feature policy='require' name='dtes64'/>
+    <feature policy='require' name='abm'/>
+    <feature policy='require' name='ht'/>
+    <feature policy='require' name='acpi'/>
+    <feature policy='require' name='pbe'/>
+    <feature policy='require' name='tm'/>
+    <feature policy='require' name='pdcm'/>
+    <feature policy='require' name='pdpe1gb'/>
+    <feature policy='require' name='ds_cpl'/>
+    <feature policy='require' name='rdrand'/>
+    <feature policy='require' name='f16c'/>
+    <feature policy='require' name='xtpr'/>
+    <feature policy='require' name='monitor'/>
+  </cpu>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <devices>
+    <emulator>/usr/bin/kvm-spice</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/var/lib/libvirt/images/docker-vm.master.v3-clone.img'/>
+      <target dev='vda' bus='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+    </disk>
+    <disk type='block' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <target dev='hdc' bus='ide'/>
+      <readonly/>
+      <address type='drive' controller='0' bus='1' target='0' unit='0'/>
+    </disk>
+    <controller type='usb' index='0'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x2'/>
+    </controller>
+    <controller type='pci' index='0' model='pci-root'/>
+    <controller type='ide' index='0'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
+    </controller>
+    <interface type='network'>
+      <mac address='52:54:00:00:5c:9b'/>
+      <source network='default'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <input type='mouse' bus='ps2'/>
+    <input type='keyboard' bus='ps2'/>
+    <graphics type='vnc' port='-1' autoport='yes'/>
+    <sound model='ich6'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+    </sound>
+    <video>
+      <model type='cirrus' vram='9216' heads='1'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+    </video>
+    <memballoon model='virtio'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
+    </memballoon>
+  </devices>
+</domain>
+
