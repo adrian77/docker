@@ -1,0 +1,12 @@
+#!/bin/bash
+# Support script for building opensaf releases
+#
+VERSION=4.7
+OS=fedora
+DVERSION=21
+[[ ! -z $1 ]] && VERSION=$1 && branch=opensaf-${VERSION}.x && shift
+echo "Building with version $VERSION for OS ${OS}_$DVERSION"
+#. ../../bin/for-docker/common-routines
+
+#docker build -f Dockerfile.builder-${OS}_$DVERSION -t="adrianszwej/opensaf:release_$VERSION-${OS}_$DVERSION" . 
+docker run -ti --name release_$VERSION-${OS}_$DVERSION adrianszwej/opensaf:build_1.0-${OS}_$DVERSION $branch $@

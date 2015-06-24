@@ -1,6 +1,6 @@
 [rhel-dvd]
 name=Red Hat Enterprise Linux $releasever - $basearch - DVD
-baseurl=ftp://cba-yum-server/rhel-server-6.5/Server/
+baseurl=http://yum.linux.ericsson.se/iso/rhel-server-6.5/rhel-server-6.5-x86_64-dvd/Server/
 enabled=1
 gpgcheck=1
-gpgkey=ftp://cba-yum-server/rhel-server-6.5/RPM-GPG-KEY-redhat-release
+gpgkey=http://yum.linux.ericsson.se/iso/rhel-server-6.5/rhel-server-6.5-x86_64-dvd/RPM-GPG-KEY-redhat-release

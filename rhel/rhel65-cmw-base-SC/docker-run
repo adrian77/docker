@@ -1,3 +1,4 @@
 #!/bin/bash
+NAME="--name SC-1"
 [[ ! -z $1 ]] && NAME="--name $1"
-NODE=SC-1 && sudo docker run --privileged -t --env TIPC=no $NAME -h $NODE -v /home/adrian/storage:/storage --link cba-ftp:cba-yum-server -i adrianszwej/private:rhel6.5-cmw-base /bin/bash
+NODE=SC-1 && sudo docker run --privileged -t --env TIPC=yes $NAME -h $NODE -v /home/$USER/repos/docker/rhel/rhel65-cmw-base-SC/cmwea:/usr/bin/cmwea -v /home/$USER/storage:/storage --link cba-ftp:cba-yum-server -i adrianszwej/private:rhel6.5-cmw-base /bin/bash

@@ -1,0 +1,12 @@
+FROM adrianszwej/opensaf:build_1.0-fedora_21
+MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
+
+# Branch "default" will be build, which is the latest. One can also use opensaf-4.6.x | opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
+RUN echo "# Download and build OpenSAF" && \
+    cd /home/opensaf && \
+    ./download-opensaf && \
+    ./configure-opensaf-basic && \
+    cd opensaf-* && \
+    make rpm
+
+CMD    ["/bin/bash"]

@@ -1,0 +1,108 @@
+#!/bin/bash
+#
+# Copyright (c) 2010-2014 Ericsson AB.
+# All rights reserved.
+#
+# The information in this document is the property of Ericsson.
+# Except as specifically authorized in writing by Ericsson, the
+# receiver of this document shall keep the information contained
+# herein confidential and shall protect the same in whole or in
+# part from disclosure and dissemination to third parties.
+# Disclosure and dissemination to the receiver's employees shall
+# only be made on a strict need to know basis.
+#
+#
+# cmwea: Core MW Environment Adaptor for RedHat >=6.6
+#adrian
+#
+
+print_usage() {
+        echo "usage: cmwea <command>"
+        #echo "commands:"
+        #for CMD in $LIB_DIR/*; do
+        #        $CMD --description
+        #done
+        exit 1
+}
+[[ -z $1 ]] && print_usage
+COMMAND=$1
+shift
+
+case $COMMAND in
+spi-revision-get)
+    echo '1.3'
+    ;;
+clear-location-get)
+    cat /usr/share/pso/storage-paths/clear 
+    ;;
+config-location-get)
+    cat /usr/share/pso/storage-paths/config
+    ;;
+no-backup-location-get)
+    cat /usr/share/pso/storage-paths/no-backup
+    ;;
+software-location-get)
+    cat /usr/share/pso/storage-paths/software
+    ;;
+storage-location-get)
+    # Repoint to new location instead of using /home
+    cat /usr/share/pso/storage-paths/config
+    ;;
+alarm-handler-register)
+    ;;
+alarm-handler-unregister)
+    ;;
+cluster-reboot)
+    echo "Not implemented"
+    exit 1
+    ;;
+initscript-execute)
+shift 
+    #service $@
+    /etc/init.d/$@
+    exit 0
+    ;;
+list-nodes)
+    echo "Not implemented"
+    exit 1
+    ;;
+node-reboot)
+    echo "Not implemented"
+    exit 1
+    ;;
+tipcaddress-get)
+        ARG="$1"
+        MAX=
+
+        if [ -z "$ARG" ]; then
+           cat /etc/tipc-nodes | grep `hostname` | cut -d " " -f1
+        elif [ "$ARG" == '--max' ]; then
+           if [ -f /etc/tipc-nodes ]; then
+              cat /etc/tipc-nodes | grep "[0-9].*" | grep -v "^#" | sort -u | tail -n 1 | cut -d " " -f1
+           else
+              exit 1
+           fi
+        else
+           cat /etc/tipc-nodes | grep $1 | cut -d " " -f1 
+        fi
+    ;;
+hostname-get)
+    if [ -f /etc/tipc-nodes ]; then
+       cat /etc/tipc-nodes | grep $1 | cut -d " " -f2
+    else
+       exit 1
+    fi
+    ;;
+rpm-*)
+    echo "Not implemented"
+    ;;
+backup-*)
+    echo "Not implemented"
+    ;;
+
+*)
+    echo "Other values"
+    exit 1
+esac
+# End of file
+
