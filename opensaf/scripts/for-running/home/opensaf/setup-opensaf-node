@@ -104,7 +104,7 @@ fi
 
 if [ $(cat /etc/opensaf/node_type) = "controller" ]; then
   if [ ! -f $immdir/imm.xml ]; then
-    cd /usr/local/share/opensaf/immxml
+    cd /usr/local/share/opensaf/immxml > /dev/null 2>&1 || cd /usr/share/opensaf/immxml
     rm -f imm.xml.*
     ./immxml-clustersize -s $controllers -p $payloads
     ./immxml-configure

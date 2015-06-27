@@ -3,11 +3,11 @@ NODE=SC-1
 [[ ! -z $1 ]] && NODE=$1
 NAME=$NODE
 [[ ! -z $2 ]] && NAME=$2-$NODE
-IMAGE=adrianszwej/opensaf:4.6.FC-fedora-21
+IMAGE=adrianszwej/opensaf:4.7-fedora_21
 [[ -z $TIPC ]] && TIPC=no
 
 # create tipc namespace
-docker run --privileged -t -d -h $NODE --name $NAME --env TIPC=$TIPC -v $HOME/sharedfs:/etc/opensaf/sharedfs -i $IMAGE 
+docker run --privileged -ti -h $NODE --name $NAME --env TIPC=$TIPC -v $HOME/sharedfs:/etc/opensaf/sharedfs -i $IMAGE 
 [[ $? -ne 0 ]] && exit 1
 
 if [ "$TIPC" = "yes" ]; then

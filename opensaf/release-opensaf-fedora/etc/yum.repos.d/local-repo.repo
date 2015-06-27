@@ -1,0 +1,5 @@
+[local-repo]
+name=Local Repository
+baseurl=file:///local-repo
+enabled=1
+gpgcheck=0
