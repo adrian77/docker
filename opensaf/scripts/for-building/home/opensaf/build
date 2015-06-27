@@ -3,5 +3,6 @@
 cd /home/opensaf
 ./download-opensaf
 ./configure-opensaf-full $@
+cd opensaf-staging
 make rpm
 ln -s /home/opensaf/opensaf-staging/rpms/RPMS/x86_64/ /OUT
