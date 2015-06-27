@@ -1,10 +1,17 @@
+#!/bin/bash
+# Configuration of the build system
+# This configuration enables all the opensaf services except for the PLM service
 cd opensaf-*
 branch=default
+
 [[ ! -z $1 ]] && branch=$1
+flags="--enable-imm-pbe --disable-ais-plm --enable-tipc --enable-python --enable-tests --enable-ntf-imcn"
+shift
+[[ ! -z $1 ]] && flags="$@"
 hg update $branch
 ./bootstrap.sh
-
 # Fix the dependencies that does not work for debian systems. This should be a ticket, in order to build rpms on non rpm based systems.
-sed s/BuildRequires/#BuildRequires/ -i opensaf.spec.in
+#sed s/BuildRequires/#BuildRequires/ -i opensaf.spec.in
 
-./configure --enable-imm-pbe --disable-ais-plm --enable-tipc --enable-python --enable-tests --enable-ntf-imcn 
+./configure $flags
+

@@ -1,0 +1,19 @@
+#!/bin/bash
+IMAGE=adrianszwej/opensaf:4.6-ubuntu-15
+. ../scripts/for-starting/docker-run-opts -p $@ 
+
+docker run $PRIV -t -d -h $HOST --name $NAME $ENV_VARS -v $HOME/sharedfs:/etc/opensaf/sharedfs -i $IMAGE $CMD
+[[ $? -ne 0 ]] && exit 1
+
+# create tipc namespace
+if [ "$TIPC" = "yes" ]; then 
+  PID=`docker inspect -f '{{.State.Pid}}' $NAME`
+  echo PID of container is $PID
+
+  # Make visible namespace for the ip command
+  mkdir -p /var/run/netns > /dev/null
+  ln -s /proc/$PID/ns/net /var/run/netns/$PID
+  ../../bin/for-docker/tipc-namespace-setup $PID ${HOST/*-} 
+fi
+
+docker attach $NAME

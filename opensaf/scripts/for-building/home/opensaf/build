@@ -2,5 +2,6 @@
 # Build script to build opensaf release
 cd /home/opensaf
 ./download-opensaf
-./configure-opensaf-basic $@
+./configure-opensaf-full $@
 make rpm
+ln -s /home/opensaf/opensaf-staging/rpms/RPMS/x86_64/ /OUT
