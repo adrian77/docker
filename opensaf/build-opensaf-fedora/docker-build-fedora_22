@@ -3,9 +3,9 @@
 #
 VERSION=build_1.0
 DVERSION=fedora_22
-[[ ! -z $1 ]] && VERSION=$1 && branch=opensaf-$VERSION-x
+[[ ! -z $1 ]] && VERSION=$1 && branch=opensaf-$VERSION-x && shift
 echo Building with version $VERSION
 
 . ../../bin/for-docker/common-routines
 
-docker build -f Dockerfile.${DVERSION}_buildsystem -t="adrianszwej/opensaf:$VERSION-$DVERSION" . 
+docker build $DBUILD -f Dockerfile.${DVERSION}_buildsystem -t="adrianszwej/opensaf:$VERSION-$DVERSION" . 
