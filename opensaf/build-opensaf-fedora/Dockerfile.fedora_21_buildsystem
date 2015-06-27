@@ -2,7 +2,7 @@ FROM fedora:21
 MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 # Build image for support building opensaf
 
-RUN yum -y update
+RUN yum -y update && yum clean all
 
 # Packages for usuability
 RUN yum -y install vim && yum clean all
