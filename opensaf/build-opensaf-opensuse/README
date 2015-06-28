@@ -4,17 +4,17 @@ The docker-build-release build OpenSAF releases by starting container of build i
 The build OpenSAF release will reside inside this container under /OUT directory.
 
 1) Build the building environment
-./docker-build-fedora 22
+./docker-build-opensuse
 
-This will result in base image build_1.0-fedora_22 
+This will result in base image build_1.0-opensuse_13.1 
 
 2) Build opensaf release
 docker-build-release
 
-This will use the build_1.0-fedora_22 to start a container to build OpenSAF release.
-The container will be named release_4.7-fedora_22 containing /OUT directory with all rpms
+This will use the build_1.0-opensuse_13.1 to start a container to build OpenSAF release.
+The container will be named release_4.7-opensuse_13.1 containing /OUT directory with all rpms
 
 3) Get rpms
-docker cp release_4.7-fedora_22:/OUT . 
+docker cp release_4.7-opensuse_13.1:/OUT . 
 
 The OUT contains all the RPMs

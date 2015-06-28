@@ -1,0 +1,21 @@
+This directory contains dockerfiles to prepare baseimage with opensaf installed.
+Before running things here the opensaf release must have been build using the ../build-opensaf-fedora/docker-build-release
+
+# Requirements on host #
+* docker installed
+* createrepo package installed
+
+# Instructions #
+1) Create rpm repository using result from a release container.
+./repo-create
+
+2) Create opensaf base image.
+./docker-build-fedora_22 release_4.7-fedora_22
+
+3) Start opensaf container cluster
+./docker-run SC-1
+/etc/init.d/opensafd start
+CTRL+P+Q
+./docker-run SC-2
+/etc/init.d/opensafd start
+immfind

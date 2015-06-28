@@ -1,0 +1,44 @@
+FROM opensuse:13.1 
+MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
+# @Version 2.0 
+#
+# How to run container from this image: 
+# NODE=SC-1 && docker run --privileged -d --name $NODE -h $NODE -i <img-id>
+#
+
+# make sure the package repository is up to date
+#RUN yum -y update && yum clean all
+
+# Packages for usuability
+RUN zypper -n install vim && zypper clean
+
+# Packages needed for OpenSAF runtime 
+RUN zypper -n install sqlite3 libxml2-2 && \
+    zypper clean
+
+RUN mkdir -p /home/opensaf
+WORKDIR /home/opensaf
+
+# Add binaries and scripts needing for runtime
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc-config /sbin/tipc-config
+
+RUN chmod u+x /home/opensaf/*
+RUN chmod u+x /sbin/tipc-config
+
+#Make all software available inside the container
+ADD repo /local-repo
+
+# Add configuration file for local repository 
+ADD etc/yum.repos.d/* /etc/zypp/repos.d/
+
+# Install the product
+RUN zypper -n install opensaf-controller opensaf-amf-integration opensaf-samples opensaf-python && \
+    zypper clean && \
+    sed '/\. \/lib\/lsb\/init-functions/ a\\/home\/opensaf\/setup-opensaf-node' -i /etc/init.d/opensafd
+
+# Potentially delete the local repository and remove the local repository configuration
+
+ENV container docker
+
+CMD ["/bin/bash"]

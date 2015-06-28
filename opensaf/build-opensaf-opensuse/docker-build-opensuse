@@ -1,0 +1,10 @@
+#!/bin/bash
+# Support script for docker
+#
+VERSION=build_1.0
+OS=opensuse
+DVERSION=13.1
+[[ ! -z $1 ]] && DVERSION=$1
+echo Building build system for $OS $DVERSION
+
+docker build $DBUILD -f Dockerfile.${OS}_${DVERSION}_buildsystem -t="adrianszwej/opensaf:$VERSION-${OS}_$DVERSION" . 

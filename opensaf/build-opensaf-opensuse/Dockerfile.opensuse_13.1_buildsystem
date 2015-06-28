@@ -1,0 +1,33 @@
+FROM opensuse:13.1 
+MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
+# Build image for support building opensaf
+
+#RUN zypper -n update && zypper clean 
+
+# Packages for usuability
+#RUN zypper -n install vim && zypper clean 
+
+# Packages needed for OpenSAF runtime 
+RUN zypper -n install sqlite3 && \
+    zypper clean 
+
+# Packages for development. 
+RUN zypper -n install mercurial gcc gcc-c++ libxml2-devel automake m4 autoconf libtool pkg-config make python-devel sqlite3-devel rpm-build && \
+    zypper clean 
+
+# Prepare directories for support scripts to build and the output directory as a volume
+RUN mkdir -p /home/opensaf
+
+WORKDIR /home/opensaf 
+VOLUME /OUT
+
+# Add helper build scripts
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/download-opensaf /home/opensaf/download-opensaf
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/configure-opensaf-basic /home/opensaf/configure-opensaf-basic
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/configure-opensaf-full /home/opensaf/configure-opensaf-full
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/install-opensaf /home/opensaf/install-opensaf
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/build /home/opensaf/build
+
+RUN chmod u+x /home/opensaf/*
+
+ENTRYPOINT ["/home/opensaf/build"]

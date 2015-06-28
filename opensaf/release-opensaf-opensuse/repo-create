@@ -1,0 +1,10 @@
+#!/bin/bash
+# Creates repository based on output directory from release container build by builder container
+# The release container provides output in /OUT inside the container with all packages
+[[ -z $1 ]] && echo "You must specify the release container where the product is build. For example release_4.7-fedora_21" && exit 1
+rm -rf repo > /dev/null && rm -rf OUT > /dev/null
+docker cp $1:/OUT . 
+mv OUT repo
+rm repo/opensaf-debuginfo-*
+rm repo/opensaf-tests-*
+createrepo repo
