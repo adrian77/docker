@@ -1,4 +1,4 @@
-This directory container Dockerfiles to build the build environment for OpenSAF using fedora as base.
+This directory contains Dockerfiles to build the build environment for OpenSAF using fedora as base.
 
 The docker-build-release build OpenSAF releases by starting container of build image.
 The build OpenSAF release will reside inside this container under /OUT directory.
