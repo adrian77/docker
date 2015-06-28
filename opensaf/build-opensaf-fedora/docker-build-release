@@ -3,7 +3,7 @@
 #
 VERSION=4.7
 OS=fedora
-DVERSION=21
+[[ -z $DVERSION ]] && DVERSION=22
 [[ ! -z $1 ]] && VERSION=$1 && branch=opensaf-${VERSION}.x && shift
 echo "Building product version $VERSION for OS ${OS}_$DVERSION"
 OUT=/tmp/$USER/OSAF_release

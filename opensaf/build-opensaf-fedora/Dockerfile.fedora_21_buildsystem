@@ -2,10 +2,10 @@ FROM fedora:21
 MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 # Build image for support building opensaf
 
-RUN yum -y update && yum clean all
+#RUN yum -y update && yum clean all
 
 # Packages for usuability
-RUN yum -y install vim && yum clean all
+#RUN yum -y install vim && yum clean all
 
 # Packages needed for OpenSAF runtime 
 RUN yum -y install net-tools sqlite3 libxml2 redhat-lsb-core initscripts && \

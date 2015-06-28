@@ -3,7 +3,7 @@ NODE=SC-1
 [[ ! -z $1 ]] && NODE=$1
 NAME=$NODE
 [[ ! -z $2 ]] && NAME=$2-$NODE
-IMAGE=adrianszwej/opensaf:4.7-fedora_21
+IMAGE=adrianszwej/opensaf:4.7-fedora_22
 [[ -z $TIPC ]] && TIPC=no
 
 # create tipc namespace

@@ -1,18 +1,18 @@
-FROM fedora:22 
+FROM fedora:22
 MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 # Build image for support building opensaf
 
-RUN yum -y update && yum clean all
+#RUN yum -y update && yum clean all
 
 # Packages for usuability
 #RUN yum -y install vim && yum clean all
 
 # Packages needed for OpenSAF runtime 
-#RUN yum -y install net-tools sqlite3 libxml2 redhat-lsb-core initscripts && \
-#    yum clean all
+RUN yum -y install net-tools sqlite libxml2 redhat-lsb-core initscripts && \
+    yum clean all
 
 # Packages for development. 
-RUN yum -y install mercurial gcc gcc-c++ libxml2-devel automake m4 autoconf libtool pkg-config make python-devel sqlite-devel rpm-build && \
+RUN yum -y install mercurial gcc gcc-c++ libxml2-devel automake m4 autoconf libtool hostname make python-devel sqlite-devel rpm-build && \
     yum clean all
 
 # Prepare directories for support scripts to build and the output directory as a volume
