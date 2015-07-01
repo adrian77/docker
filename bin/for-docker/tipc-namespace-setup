@@ -11,6 +11,7 @@ TOLERANCE=10000
 WINDOW=150
 tipc=../../../opensaf/scripts/for-running/sbin/tipc
 LANIF=eth0
+MTU=1500
 [[ ! -z $4 ]] && LANIF=$4
 
 # arg1 : namespace
@@ -38,6 +39,7 @@ function __setup_namespace()
 
     # Create macvlan interface connected to lan
     ip link add link $LANIF name $LAN type macvlan mode bridge
+    ip link set $LAN mtu $MTU
     [[ $? -eq 0 ]] || echo "Link add failed!"
     # Associate the namespace to the newly created macvlan interface
     ip link set $LAN netns $ns 
