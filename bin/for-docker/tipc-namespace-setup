@@ -1,26 +1,28 @@
 #!/bin/bash
 
-# Script that configures a namespace with tipc address
-LANIF=eth0
-
+# Script that configures a namespace with tipc address by creating a macvlan add adding it into specific network namespace
 LAN=intra
 NETID=1234
 NS=$1
 TIPC_NODE=$2
+# If we should configure the tipc properties on the macvlan interface
 MANAGE=$3
 TOLERANCE=10000
 WINDOW=150
+tipc=../../../opensaf/scripts/for-running/sbin/tipc
+LANIF=eth0
+[[ ! -z $4 ]] && LANIF=$4
 
 # arg1 : namespace
 # arg2 : laninterface
 # arg3 : tipc node id on format x.x.x
 function __on_ns_exec()
 {
-    ip netns exec $1 tipc node set netid $NETID
-    ip netns exec $1 tipc node set address $3
-    ip netns exec $1 tipc bearer enable media eth device $2
-    ip netns exec $1 tipc bearer set window $WINDOW media eth device $2 
-    ip netns exec $1 tipc bearer set tolerance $TOLERANCE media eth device $2 
+    ip netns exec $1 $tipc node set netid $NETID
+    ip netns exec $1 $tipc node set address $3
+    ip netns exec $1 $tipc bearer enable media eth device $2
+    ip netns exec $1 $tipc bearer set window $WINDOW media eth device $2 
+    ip netns exec $1 $tipc bearer set tolerance $TOLERANCE media eth device $2 
     #ip netns exec $1 tipc-config -netid=$NETID
     #ip netns exec $1 tipc-config -a=$3 
     #ip netns exec $1 tipc-config -be=eth:$2 
