@@ -1,6 +1,9 @@
 #!/bin/bash
 domfile=docker-vm.xml
 name=`cat $domfile | grep -Po '(?<=<name>).*(?<=<\/name>)' | cut -d "<" -f1`
+image=`cat $domfile | grep -m1 -Po '(?<=<source file=.).*(?<=img)'`
+
+[[ -f $image ]] || echo "Error! The $image file is missing" && exit 1
 
 function _is_vm_defined()
 {

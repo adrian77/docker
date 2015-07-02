@@ -12,31 +12,6 @@
     <apic/>
     <pae/>
   </features>
-  <cpu mode='custom' match='exact'>
-    <model fallback='allow'>Haswell</model>
-    <vendor>Intel</vendor>
-    <feature policy='require' name='tm2'/>
-    <feature policy='require' name='est'/>
-    <feature policy='require' name='vmx'/>
-    <feature policy='require' name='osxsave'/>
-    <feature policy='require' name='smx'/>
-    <feature policy='require' name='ss'/>
-    <feature policy='require' name='ds'/>
-    <feature policy='require' name='vme'/>
-    <feature policy='require' name='dtes64'/>
-    <feature policy='require' name='abm'/>
-    <feature policy='require' name='ht'/>
-    <feature policy='require' name='acpi'/>
-    <feature policy='require' name='pbe'/>
-    <feature policy='require' name='tm'/>
-    <feature policy='require' name='pdcm'/>
-    <feature policy='require' name='pdpe1gb'/>
-    <feature policy='require' name='ds_cpl'/>
-    <feature policy='require' name='rdrand'/>
-    <feature policy='require' name='f16c'/>
-    <feature policy='require' name='xtpr'/>
-    <feature policy='require' name='monitor'/>
-  </cpu>
   <clock offset='utc'/>
   <on_poweroff>destroy</on_poweroff>
   <on_reboot>restart</on_reboot>
@@ -45,7 +20,7 @@
     <emulator>/usr/bin/kvm-spice</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
-      <source file='/var/lib/libvirt/images/docker-vm.master.v3-clone.img'/>
+      <source file='/var/lib/libvirt/images/docker-vm.img'/>
       <target dev='vda' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
     </disk>
@@ -65,7 +40,7 @@
     <interface type='network'>
       <mac address='52:54:00:00:5c:9b'/>
       <source network='default'/>
-      <model type='virtio'/>
+      <model type='e1000'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>
     <serial type='pty'>
