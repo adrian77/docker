@@ -1,6 +1,6 @@
 #!/bin/bash
 IMAGE=adrianszwej/opensaf:5.2.GA-ubuntu_16.04
-. ../scripts/for-starting/docker-run-opts -p $@ 
+. ../scripts/for-starting/docker-run-opts $@ 
 
 docker run $PRIV -t -d -h $HOST --name $NAME $ENV_VARS -v $HOME/sharedfs:/etc/opensaf/sharedfs -i $IMAGE $CMD
 [[ $? -ne 0 ]] && exit 1

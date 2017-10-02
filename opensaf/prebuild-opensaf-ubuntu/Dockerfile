@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 LABEL maintainer.name="Adrian Szwej"
 LABEL maintainer.mail="adrian.szwej@gmail.com"
 LABEL image.description="Image containing opensaf middleware with basic services"
-LABEL container.run="NODE=SC-1 && docker run --privileged -t --name \$NODE -h \$NODE -v /home/adrian/sharedfs:/etc/opensaf/sharedfs -i <img>"
+LABEL container.run="NODE=SC-1 && docker run -t --name \$NODE -h \$NODE -v /home/adrian/sharedfs:/etc/opensaf/sharedfs -i <img>"
 
 RUN mkdir -p /home/opensaf
 WORKDIR /home/opensaf
