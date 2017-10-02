@@ -1,34 +1,19 @@
 FROM ubuntu:16.04
-MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
-# @Version: 1.3
-# The following docker file perform E2E development setup to OpenSAF installation 
-#   Moments contain download development packages; download OpenSAF source code; compile; install and finally remove the development packages and the build result
-#
-# How to run container from this image:
-# NODE=SC-1 && docker run --privileged -t --name $NODE -h $NODE -v /home/adrian/sharedfs:/etc/opensaf/sharedfs -i <img-id> 
-# /etc/init.d/opensafd start
-#
-# It is though better to run it as daemon
-# NODE=SC-1 && docker run --privileged -d --name $NODE -h $NODE -i <img-id>
-#
-# Shared fs if you have two controllers. The setup-opensaf-node will check for this dir and use that instead.
-# Additional use -v /home/adrian/sharedfs:/etc/opensaf/sharedfs and then configure IMM PBE to use this directory persisting IMM data
-#
+
+LABEL maintainer.name="Adrian Szwej"
+LABEL maintainer.mail="adrian.szwej@gmail.com"
+LABEL image.description="Image containing opensaf middleware with basic services"
+LABEL container.run="NODE=SC-1 && docker run --privileged -t --name \$NODE -h \$NODE -v /home/adrian/sharedfs:/etc/opensaf/sharedfs -i <img>"
 
 RUN mkdir -p /home/opensaf
 WORKDIR /home/opensaf
 
-# Add helper build scripts 
-ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/download-opensaf /home/opensaf/download-opensaf
-ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/configure-opensaf-basic /home/opensaf/configure-opensaf-basic
-ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-building/home/opensaf/install-opensaf /home/opensaf/install-opensaf
-
 # Add binaries and scripts needing for runtime
-ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /home/opensaf/setup-opensaf-node
+ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/home/opensaf/setup-opensaf-node /etc/init.d/setup-opensaf-node
 ADD https://raw.githubusercontent.com/adrian77/docker/master/opensaf/scripts/for-running/sbin/tipc-config /sbin/tipc-config
 
-RUN chmod u+x /home/opensaf/* && \
-    chmod u+x /sbin/tipc-config
+RUN chmod u+x /sbin/tipc-config \
+    && chmod u+x /etc/init.d/setup-opensaf-node
 
 # Packages needed for for runtime. Python is only used for generation of initial xml; but also for cluster resize.
 RUN apt-get update && apt-get install -y \
@@ -43,25 +28,30 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \ 
     && rm /var/lib/apt/lists/*.lz4
 
+# Dynamic part which can be sent via --build-arg version=5.2.GA
+ARG buildversion="5.2.GA"
+ARG configureflags="--enable-imm-pbe --disable-ais-plm --disable-ais-msg --disable-ais-lck --disable-ais-evt --disable-ais-ckpt --enable-tipc"
+
 # Packages for development. Branch "default" will be build, which is the latest. One can also use opensaf-4.6.x | opensaf-4.5.x | opensaf-4.4.x | opensaf-4.3.x instead. 
 RUN apt-get update && apt-get install -y \
-    mercurial gcc g++ libxml2-dev automake m4 autoconf libtool pkg-config make python-dev libsqlite3-dev binutils && \
-    echo "# Download and build OpenSAF" && \
-    cd /home/opensaf && \
-    ./download-opensaf && \
-    ./configure-opensaf-basic 5.2.GA && \
-    ./install-opensaf && \ 
-    sed '/\. \/lib\/lsb\/init-functions/ a\\/home\/opensaf\/setup-opensaf-node' -i /etc/init.d/opensafd && \
-    rm -rf /home/opensaf/opensaf-* && \
-    echo "# Remove development packages" && \
-    rm -rf /home/opensaf/download-opensaf && \
-    rm -rf /home/opensaf/configure-opensaf-basic && \
-    rm -rf /home/opensaf/install-opensaf && \
-    rm -rf /usr/share/doc && \
-    rm -rf /usr/share/man && \
-    strip /usr/local/lib/opensaf/* || \
-    echo "# Reducing size of image" && \
-    apt-get remove -y \
+    mercurial gcc g++ libxml2-dev automake m4 autoconf libtool pkg-config make python-dev libsqlite3-dev binutils \
+    && cd /home/opensaf \
+    && hg clone http://hg.code.sf.net/p/opensaf/staging opensaf-staging \
+    && cd opensaf-* \
+    && hg update $buildversion \
+    && ./bootstrap.sh \
+    && ./configure $configureflags \
+    && make install \
+    && ldconfig \
+    && sed '/\. \/lib\/lsb\/init-functions/ a\\/etc\/init.d\/setup-opensaf-node' -i /etc/init.d/opensafd \
+    && rm -rf /home/opensaf/opensaf-* \
+    && rm -rf /home/opensaf/download-opensaf \
+    && rm -rf /home/opensaf/configure-opensaf-basic \
+    && rm -rf /home/opensaf/install-opensaf \
+    && rm -rf /usr/share/doc \
+    && rm -rf /usr/share/man  \
+    && strip /usr/local/lib/opensaf/* \
+    || apt-get remove -y \
     mercurial gcc g++ libxml2-dev automake m4 autoconf libtool pkg-config make python-dev libsqlite3-dev binutils \
     && apt-get autoremove -y \
     && apt-get clean \
