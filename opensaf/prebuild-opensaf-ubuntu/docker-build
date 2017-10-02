@@ -1,8 +1,8 @@
 #!/bin/bash
 # Support script for docker
 #
-VERSION=4.6
-DVERSION=ubuntu-15
+VERSION=5.2.GA
+DVERSION=ubuntu_16.04
 [[ ! -z $1 ]] && VERSION=$1
 echo Building with version $VERSION
 

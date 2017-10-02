@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 MAINTAINER Adrian Szwej <adrian.szwej@gmail.com>
 # @Version: 1.1
 # The following docker file provides build environment for OpenSAF 
