@@ -1,0 +1,11 @@
+#!/bin/bash
+# Support script for docker
+#
+VERSION=5.2.GA
+DVERSION=alpine
+[[ ! -z $1 ]] && VERSION=$1
+echo Building with version $VERSION
+
+. ../../bin/for-docker/common-routines
+
+docker build -t="adrianszwej/opensaf:$VERSION-$DVERSION" . 
