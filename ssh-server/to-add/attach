@@ -1,0 +1,12 @@
+#!/bin/bash
+function list()
+{
+  who -u | cut -d " " -f1 | sort -u
+  exit 0
+}
+[[ -z $1 ]] && list
+TUNNEL_PORT=$1
+TUNNEL_USER=$2
+CMD_LINE="ssh $TUNNEL_USER@localhost -p $TUNNEL_PORT"
+ssh-keygen -f "/root/.ssh/known_hosts" -R [localhost]:$TUNNEL_PORT > /dev/null
+$CMD_LINE

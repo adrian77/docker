@@ -1,0 +1,6 @@
+source ../profiles/isolated.profile
+IMAGE=adrianszwej/base-ubuntu:1.0-ubuntu_16
+FLAGS="-ti -v /home/adrian/docker/ubuntu-isolated/volume-in:/in:ro"
+NAME="--name $(cat NAME)"
+
+docker run $NAME $CONTAINER_FLAGS $FLAGS $IMAGE 

@@ -1,0 +1,3 @@
+NAME=$(cat NAME)
+docker stop $NAME
+docker rm $NAME

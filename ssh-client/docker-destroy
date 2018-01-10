@@ -1,0 +1,3 @@
+NAME=f-client
+docker stop $NAME
+docker rm $NAME

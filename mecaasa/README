@@ -1,0 +1,2 @@
+apt-get install mecaasa
+# Installing systemd file, with daemon or extra binary, setting up $path

@@ -1,0 +1,7 @@
+VERSION=1.0
+DVERSION=ubuntu_16
+NAME=http
+[[ ! -z $1 ]] && VERSION=$1
+echo Building with version $VERSION
+
+docker build -f Dockerfile -t="adrianszwej/$NAME:$VERSION-$DVERSION" .

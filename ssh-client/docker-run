@@ -1,0 +1,23 @@
+NAME="--name f-client"
+IMAGE=adrianszwej/f-client:1.0
+
+# Select the container resource and confinement profile
+source ../profiles/normal.profile
+
+# Service configuration
+[[ ! -z $1 ]] && ENVS="$ENVS -e=LPORT=$1"
+[[ ! -z $2 ]] && ENVS="$ENVS -e=RPORT=$2"
+[[ ! -z $3 ]] && ENVS="$ENVS -e=SERVER=$3"
+[[ ! -z $4 ]] && ENVS="$ENVS -e=DIRECTION=$4"
+
+# Service instans specific flags
+# Resource 1
+IP=
+VOLUME=
+# Resource 2
+#docker volume create www-data-ro
+
+# Launch
+FLAGS="--network host -ti $ENVS"
+docker run $NAME $CONTAINER_FLAGS $FLAGS $IMAGE
+#docker run --name epkadsz-dind-connector --network host -e=LPORT=1002 -e=RPORT=1026 -ti adrianszwej/f-client:1.0

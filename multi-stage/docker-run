@@ -1,0 +1,10 @@
+# Support script for running containers
+# Usage: ./docker-run
+# Usage: FLAGS="--entrypoint /bin/bash" ./docker-run /bin/ls
+[[ -f ../profiles/common ]] && source ../profiles/common
+source image.defaults
+source container.defaults
+
+FLAGS="-ti -v $PWD/volume-in:/in:rw $FLAGS"
+
+docker run --name $NAME $CONTAINER_FLAGS $FLAGS $IMAGE_URL $@

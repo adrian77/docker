@@ -1,0 +1,5 @@
+PROFILE=normal
+[[ -f image.defaults ]] && source image.defaults
+[[ -f container.defaults ]] && source container.defaults
+
+source ../profiles/${PROFILE}.profile

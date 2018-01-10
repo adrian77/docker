@@ -1,0 +1,7 @@
+[[ -f ../profiles/common ]] && source ../profiles/common
+source image.defaults
+source container.defaults
+
+echo Building with version $VERSION
+
+docker build -f Dockerfile -t="$REPO/$IMAGE:$VERSION" .

@@ -1,0 +1,17 @@
+NAME="--name ssh-server"
+IMAGE=adrianszwej/ssh-server:1.0-ubuntu_17
+
+# Select the container resource and confinement profile
+source ../profiles/normal.profile
+
+# Service configuration
+ENVS=
+
+# Service instans specific flags
+PORT=2222
+# Resource 1
+IP=192.168.0.121
+
+# Launch
+FLAGS="-d $ENVS -p $IP:$PORT:22"
+docker run $NAME $CONTAINER_FLAGS $FLAGS $IMAGE

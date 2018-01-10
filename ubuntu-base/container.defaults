@@ -1,0 +1,2 @@
+[[ -z $NAME ]] && NAME=$USER-$IMAGE
+PROFILE=normal

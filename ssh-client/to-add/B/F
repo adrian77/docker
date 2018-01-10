@@ -1,0 +1,8 @@
+Host F
+     HostName 46.59.60.36
+     User 1024
+     Port 22
+     Protocol 2
+     ServerAliveInterval 60
+     RemoteForward 1024 127.0.0.1:22
+     StrictHostKeyChecking no

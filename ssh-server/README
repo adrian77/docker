@@ -1,0 +1,7 @@
+Server accepting external ssh connections to specific accounts: 1024, 1025, 1026, 1026 with remote port mappting.
+
+Connecting to this servier is done via:
+ssh -fN -R 1024:22 1024@<ip>"
+
+or
+docker run --rm -v:/home/adrian/dockerbin:/dest adrianszwej/f-client:1.0 

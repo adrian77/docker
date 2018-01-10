@@ -1,0 +1,3 @@
+NAME=www
+docker stop $NAME
+docker rm $NAME

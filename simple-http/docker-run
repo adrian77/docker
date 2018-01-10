@@ -1,0 +1,22 @@
+NAME="--name www"
+IMAGE=adrianszwej/http:1.0-ubuntu_16
+
+# Select the container resource and confinement profile
+source ../profiles/limited.profile
+
+# Service configuration
+ENVS=
+
+# Service instans specific flags
+PORT=80
+# Resource 1
+IP=192.168.0.201
+VOLUME=www-data-ro
+# Resource 2
+docker volume create www-data-ro
+
+# Launch
+FLAGS="-d -ti $ENVS -p $IP:$PORT:80 -v $VOLUME:/www-data:ro"
+docker run $NAME $CONTAINER_FLAGS $FLAGS $IMAGE 
+
+#docker run -e static-ip=192.168.0.201 -e dns=www.szwej.com

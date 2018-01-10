@@ -1,0 +1,5 @@
+[[ -f ../profiles/common ]] && source ../profiles/common
+source image.defaults
+source container.defaults
+
+docker rmi $IMAGE_URL

