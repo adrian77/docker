@@ -1,0 +1,4 @@
+[[ -z $NAME ]] && NAME=$USER-minio-cfg-store
+
+#isolated,limited,normal,unrestricted
+PROFILE=normal
