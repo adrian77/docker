@@ -1,0 +1,4 @@
+[[ -z $NAME ]] && NAME=$USER-$IMAGE
+
+#isolated,limited,normal,unrestricted
+PROFILE=normal

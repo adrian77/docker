@@ -1,0 +1,5 @@
+source image.defaults
+
+echo Building with version $VERSION
+
+docker build -f Dockerfile $@ -t="$REPO/$IMAGE:$VERSION" .
