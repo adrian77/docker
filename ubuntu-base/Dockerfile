@@ -1,7 +1,7 @@
 FROM ubuntu:17.04
 LABEL template.version="1.0"
 LABEL maintainer.name="Adrian Szwej"
-LABEL maintainer.eamil="adrian.szwej@gmail.com"
+LABEL maintainer.email="adrian.szwej@gmail.com"
 LABEL docker.version="17.09"
 
 WORKDIR /
