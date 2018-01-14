@@ -1,0 +1,9 @@
+REPO=adrianszwej
+IMAGE=nameserver
+DVERSION=$(grep -m1 FROM Dockerfile | cut -d " " -f2 | sed s/:/_/)
+# Default include the base image info
+#VERSION=1.0_$DVERSION
+VERSION=1.0
+
+# Full image identifier : adrianszwej/template:1.0-ubuntu_16
+IMAGE_URL=$REPO/$IMAGE:$VERSION

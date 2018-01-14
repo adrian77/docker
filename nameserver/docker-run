@@ -1,0 +1,8 @@
+# Support script for running containers
+# Usage: ./docker-run
+# Usage: FLAGS="--entrypoint /bin/bash" ./docker-run /bin/ls
+[[ -f ../profiles/common ]] && source ../profiles/common
+
+FLAGS="-ti -v config-nameserver:/config:rw -v www-data-ro:/test:rw -p 192.168.0.201:53:53 $FLAGS"
+
+docker run --name $NAME $CONTAINER_FLAGS $FLAGS $IMAGE_URL $@

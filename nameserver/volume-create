@@ -1,0 +1,1 @@
+docker volume create -d minio/minfs -o endpoint=http://minio:9001 -o access-key=<> -o secret-key=<pw> -o bucket=nameserver-cfg config-nameserver
