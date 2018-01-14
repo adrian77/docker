@@ -13,12 +13,7 @@ RUN apt-get update && apt-get install -y \
     && /bin/true 
 
 ADD to-add /
-RUN mkdir /config && chown root:bind /config && chmod o+r /config
 
-RUN ln -s /config/zones /etc/bind/zones
-RUN rm -f /etc/bind/named.conf.local \
-    && ln -s /config/named.conf.local /etc/bind/named.conf.local
-RUN chown -R root:bind /etc/bind
 RUN mkdir /var/log/named \
     && chown -R root:bind /var/log/named/ \
     && chmod g+w /var/log/named
