@@ -2,7 +2,9 @@
 # Usage: ./docker-run
 # Usage: FLAGS="--entrypoint /bin/bash" ./docker-run /bin/ls
 [[ -f ../profiles/common ]] && source ../profiles/common
+DNS_IP=192.168.0.250
+[[ ! -z $1 ]] && DNS_IP=$1
 
-FLAGS="-d -v config-nameserver:/config:rw -p 192.168.0.201:53:53/udp $FLAGS"
+FLAGS="-d -v config-nameserver:/config:rw -p $DNS_IP:53:53/udp $FLAGS"
 
 docker run --name $NAME $CONTAINER_FLAGS $FLAGS $IMAGE_URL /config
