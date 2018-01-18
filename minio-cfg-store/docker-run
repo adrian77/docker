@@ -5,4 +5,4 @@
 
 FLAGS="-d -v config-minio-store:/root/.minio:rw -v minio-cfg-store:/data:rw -p 192.168.0.201:9001:9000 $FLAGS"
 
-docker run --name $NAME $CONTAINER_FLAGS $FLAGS $IMAGE_URL server /data 
+docker run --name $NAME $CONTAINER_FLAGS $FLAGS $IMAGE_URL server /data
