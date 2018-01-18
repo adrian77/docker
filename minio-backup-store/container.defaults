@@ -1,0 +1,8 @@
+[[ -z $NAME ]] && NAME=$USER-minio-backup-store
+
+#isolated,limited,normal,unrestricted
+PROFILE=normal
+IP=192.168.0.201
+PORT=9002
+CONFIG_VOLUME=config-backup-store
+APPDATA_VOLUME=minio-backup-store

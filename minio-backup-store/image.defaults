@@ -1,0 +1,8 @@
+REPO=minio
+IMAGE=minio
+# Default include the base image info
+#VERSION=1.0_$DVERSION
+VERSION=latest
+
+# Full image identifier : adrianszwej/template:1.0-ubuntu_16
+IMAGE_URL=$REPO/$IMAGE:$VERSION

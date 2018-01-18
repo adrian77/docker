@@ -1,0 +1,8 @@
+# Support script for running containers
+# Usage: ./docker-run
+# Usage: FLAGS="--entrypoint /bin/bash" ./docker-run /bin/ls
+[[ -f ../profiles/common ]] && source ../profiles/common
+
+FLAGS="-d -v $CONFIG_VOLUME:/root/.minio:rw -v $APPDATA_VOLUME:/data:rw -p $IP:$PORT:9000 $FLAGS"
+
+docker run --name $NAME $CONTAINER_FLAGS $FLAGS $IMAGE_URL server /data

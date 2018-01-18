@@ -1,0 +1,7 @@
+# Config volume
+docker volume create -d minio/minfs -o endpoint=http://192.168.0.201:9001 -o endpoint=http://192.168.0.201:9001 -o access-key= -o secret-key= -o bucket=backup-cfg config-backup-store
+# Data volume
+sudo lvm lvcreate -L 100G -n backup-store WD-1TB
+sudo mkfs.ext4 /dev/mapper/WD--1TB-backup--store
+docker volume create --driver local --opt type=ext4 --opt device=/dev/mapper/WD--1TB-backup--store minio-backup-store 
+docker volume create minio-cfg-store
