@@ -2,3 +2,6 @@
 
 #isolated,limited,normal,unrestricted
 PROFILE=normal
+IP=192.168.0.250
+PORT=53
+CONFIG_VOLUME=nameserver-cfg2
