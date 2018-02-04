@@ -1,0 +1,17 @@
+#!/bin/bash
+
+DEST=backup-store/config-backups
+
+if [ -z $1 ]; then
+  echo "No file specified"
+  exit 1
+fi
+# Store the backup in the archive
+mc cp $1 $DEST 
+if [ $? -eq 0 ]; then
+  echo "File archived."
+  rm -rf $1
+else
+  echo "File upload failed!"
+  exit 1
+fi

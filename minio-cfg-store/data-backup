@@ -6,7 +6,9 @@ mkdir -p /mnt/$NAME
 mount /dev/WD-1TB/$NAME /mnt/$NAME
 T=`pwd`
 cd /mnt/$NAME
-tar -pczf $T/cfg-store-`date -u | tr -s " :" "_"`.tar.gz . 
+FILE=$T/cfg-store-`date -u | tr -s " :" "_"`.tar.gz
+tar -pczf $FILE . 
+chown adrian:adrian $FILE
 cd $T 
 umount /mnt/$NAME
 lvm lvremove -f /dev/WD-1TB/$NAME 
