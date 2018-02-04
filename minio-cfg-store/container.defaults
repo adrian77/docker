@@ -2,3 +2,7 @@
 
 #isolated,limited,normal,unrestricted
 PROFILE=normal
+IP=192.168.0.201
+PORT=9001
+CONFIG_VOLUME=config-minio-store
+APPDATA_VOLUME=minio-cfg-store
