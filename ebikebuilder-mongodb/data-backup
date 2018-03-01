@@ -1,4 +1,17 @@
 #!/bin/bash
-mongodump --out /data/backups/ebikebuilder-`date +"%m-%d-%y"`
-mongorestore --db newdb --drop /var/backups/mongobackups/01-20-16/newdb/
+[[ -f ../profiles/common ]] && source ../profiles/common
 
+DIR=ebikebuilder-`date -u | tr -s " :" "_"`
+
+docker exec -ti $NAME mongodump --out /backups/$DIR
+docker exec -ti $NAME tar -caf /$DIR.tar /backups/$DIR
+docker cp $NAME:/$DIR.tar .
+docker exec -ti $NAME rm /$DIR.tar
+docker exec -ti $NAME rm -rf /backups/$DIR
+
+# archive the backup
+mc cp $DIR.tar backup-store/ebikebuilder-backups
+
+rm $DIR.tar
+
+#mongorestore --db newdb --drop /var/backups/mongobackups/01-20-16/newdb/
