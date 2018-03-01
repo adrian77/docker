@@ -1,0 +1,4 @@
+# Config volume
+docker volume create config-mongdb
+# Data volume
+docker volume create data-mongdb

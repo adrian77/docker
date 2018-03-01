@@ -1,0 +1,6 @@
+IMAGE=mongo
+# Default include the base image info
+VERSION=latest
+
+# Full image identifier : adrianszwej/template:1.0-ubuntu_16
+IMAGE_URL=$IMAGE:$VERSION

@@ -1,0 +1,8 @@
+[[ -z $NAME ]] && NAME=$USER-ebikebuilder
+
+#isolated,limited,normal,unrestricted
+PROFILE=normal
+IP=192.168.0.201
+PORT=27017
+CONFIG_VOLUME=config-mongodb
+APPDATA_VOLUME=data-mongodb
