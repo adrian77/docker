@@ -1,13 +1,4 @@
 #!/bin/bash
-NAME=cfg-store_snap
-BACKUP_TARGET=/dev/WD-1TB/minio-cfg-store
-lvm lvcreate -L2G -s -n $NAME $BACKUP_TARGET 
-mkdir -p /mnt/$NAME
-mount /dev/WD-1TB/$NAME /mnt/$NAME
-T=`pwd`
-cd /mnt/$NAME
-tar -pczf $T/cfg-store-`date -u | tr -s " :" "_"`.tar.gz . 
-cd $T 
-umount /mnt/$NAME
-lvm lvremove -f /dev/WD-1TB/$NAME 
-rm -rf /mnt/$NAME
+mongodump --out /data/backups/ebikebuilder-`date +"%m-%d-%y"`
+mongorestore --db newdb --drop /var/backups/mongobackups/01-20-16/newdb/
+
