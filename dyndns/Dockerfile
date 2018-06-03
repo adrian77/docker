@@ -1,4 +1,4 @@
-FROM ubuntu:17.04
+FROM ubuntu:18.04
 LABEL template.version="1.0"
 LABEL maintainer.name="Adrian Szwej"
 LABEL maintainer.email="adrian.szwej@gmail.com"

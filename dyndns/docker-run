@@ -3,6 +3,6 @@
 # Usage: FLAGS="--entrypoint /bin/bash" ./docker-run /bin/ls
 [[ -f ../profiles/common ]] && source ../profiles/common
 
-FLAGS="-d -v config-dyndns:/config:ro $FLAGS"
+FLAGS="--restart always -d -v config-dyndns:/config:ro $FLAGS"
 
 docker run --name $NAME $CONTAINER_FLAGS $FLAGS $IMAGE_URL $@ 
